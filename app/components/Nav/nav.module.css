@@ -1,3 +1,8 @@
+.nav1 p {
+    margin: 0;
+    padding: 0;
+}
+
 .nav1 {
     height: 110px;
     display: flex;
@@ -14,8 +19,8 @@
 }
 
 .logoContainer {
-    width: 72px;
-    height: 72px;
+    width: 120px;
+    height: 80px;
 }
 
 .logoContainer img {
@@ -26,30 +31,72 @@
 
 .searchBarContainer {
     display: flex;
-    width: 450px;
-    height: 35px;
-    background-color: red;
-    border-radius: 25px;
+    width: 40%;
+    height: 40px;
+    background-color: #F8C051;
+    border-radius: 10px;
 }
 
 .searchBar {
-    width: 85%;
+    width: 90%;
     height: 100%;
     padding: 10px;
-    border-radius: 25px 0px 0px 25px;
+    border-radius: 10px 0px 0px 10px;
+    border-color: #EBEDF0;
 }
 
 .searchBtn {
     background-color: transparent;
     border: 0px;
-    width: 25px;
-    margin-left: 15px;
-    color: white;
+    width: 10%;
+    color: #261A02;
 }
 
-.loginBtn {
+.navBtns {
     background-color: transparent;
     border: 0px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    color: black;
+    text-decoration: none;
+    position: relative;
+}
+
+.cartInfoContainer {
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+    align-items: start;
+}
+
+.cartInfoContainer p:first-child {
+    color: gray;
+    font-size: small;
+}
+
+.counter {
+    width: 16px;
+    height: 16px;
+    background-color: #F8C051;
+    border-radius: 100%;
+    position: absolute;
+    top: 5px;
+    left: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.counter p {
+    font-size: small;
+    padding-bottom: 2px;
+    padding-left: 1px;
+}
+
+.wishlist .counter {
+    top: -2px;
 }
 
 .nav2 {
@@ -74,8 +121,13 @@
     list-style-type: none;
 }
 
-.nav2 li:hover {
-    color: rgb(176, 23, 23);
+.nav2 li :first-child {
+    color: black;
+    text-decoration: none;
+}
+
+.nav2 li:hover :first-child {
+    color: #F8C051;
     cursor: pointer;
 }
 
@@ -107,17 +159,29 @@
     cursor: pointer;
 }
 
-.nav2 .searchBarContainer {
+.nav2 .searchBarContainer, .nav2 .navBtns, .navHeader h1 {
     display: none;
 }
 
 @media (max-width: 1024px) {
-    .nav2 ul, .nav1 .searchBarContainer, .nav1 .loginBtn {
+    .nav2 ul, .nav1 .searchBarContainer, .nav1 .navBtns {
         display: none;
     }
 
-    .menuBtn, .nav2 .searchBarContainer {
+    .menuBtn, .nav2 .searchBarContainer, .navHeader h1, .nav2 .navBtns {
         display: block;
+    }
+
+    .nav2 .searchBarContainer {
+        width: 60%;
+    }
+
+    .nav2 .searchBar, .nav2 .searchBarContainer {
+        height: 35px;
+    }
+
+    .nav2 .searchBarContainer svg {
+        height: 25px;
     }
 }
 
@@ -125,8 +189,4 @@
     .menuBtn p {
         display: none;
     }
-}
-
-.nav2 .searchBarContainer {
-    width: 80%;
 }
