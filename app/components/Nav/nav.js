@@ -1,3 +1,4 @@
+import '../../globals.css';
 import styles from "./nav.module.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -35,12 +36,20 @@ function Nav1() {
 function Nav2() {
     return (
         <div className={`container-fluid ${styles.nav2}`}>
-            <div className={`container`}>
+            <div className={`container ${styles.contentContainer}`} >
                 <ul>
                     <li>Home</li>
                     <li>Categories</li>
                     <li>About Us</li>
                 </ul>
+                <div className={styles.menuBtn} >
+                    <FontAwesomeIcon className={styles.menuIcon} icon="fa-solid fa-bars" />
+                    <p>Menu</p>
+                </div>
+                <div className={styles.searchBarContainer} >
+                    <input type="text" className={styles.searchBar} />
+                    <button type="submit" className={styles.searchBtn}><FontAwesomeIcon icon="fa-solid fa-magnifying-glass" /></button>
+                </div>
             </div>
         </div>
     )
