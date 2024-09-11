@@ -100,35 +100,75 @@
 }
 
 .nav2 {
-    background-color: #EFEFEF;
     height: 40px;
     position: sticky;
     top: 0;
 }
 
-.nav2 ul {
-    height: 40px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    justify-content: space-evenly;
-    width: 40%;
-    padding: 0;
-    margin: 0;
+.nav2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #eef2f6;
 }
 
-.nav2 li {
+.nav2 ul {
+    padding: 0;
+    margin: 0;
     list-style-type: none;
 }
 
-.nav2 li :first-child {
+.nav2 li {
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.nav2 li a {
+    text-decoration: none;
+    color: black;
+}
+
+.nav2 .mainNav {
+    display: flex;
+    gap: 50px;
+}
+
+.nav2 .mainNav li a {
     color: black;
     text-decoration: none;
 }
 
-.nav2 li:hover :first-child {
+.nav2 .categoriesDropDown {
+    display: none;
+    position: absolute;
+    z-index: 999;
+    width: 80vw;
+    left: -98%;
+    padding-top: 8px;
+}
+
+.nav2 .categoriesDropDown ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 20px;
+    gap: 50px;
+    align-items: center;
+    border: 1px solid #eef2f6;
+    border-radius: 5px;
+    min-height: 50px;
+}
+
+.nav2 .mainNav li a:hover {
     color: #F8C051;
-    cursor: pointer;
+}
+
+.nav2 .categoriesLink:hover .categoriesDropDown {
+    display: block;
 }
 
 .contentContainer {
@@ -164,7 +204,7 @@
 }
 
 @media (max-width: 1024px) {
-    .nav2 ul, .nav1 .searchBarContainer, .nav1 .navBtns {
+    .nav2 .mainNav, .nav1 .searchBarContainer, .nav1 .navBtns {
         display: none;
     }
 
@@ -189,4 +229,70 @@
     .menuBtn p {
         display: none;
     }
+}
+
+.sideBarHeader {
+    background-color: #261A02;
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sideBarHeader button {
+    background-color: transparent;
+    border: 0;
+    color: #FCE0A8;
+}
+
+.sideBarLogo {
+    width: 120px;
+    height: 80px;
+}
+
+.sideBarLogo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sideBarBody {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sideNavItem {
+    width: 100%;
+    height: 50px;
+    border-radius: 15px;
+    background-color: #FCE0A8;
+    display: flex;
+    align-items: center;
+}
+
+.sideNavItem :first-child {
+    background-color: transparent;
+    border: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding-left: 5px;
+}
+
+.sideNavItem a:hover, .sideNavItem button:hover, .sideNavItem a:hover path, .sideNavItem button:hover path {
+    color: rgb(107, 107, 107);
+}
+
+.categoriesSideNav {
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-self: center;
+}
+
+.categoriesSideNav li {
+    background-color: #ffd684;
+    height: 30px;
+    padding-left: 10px;
 }
