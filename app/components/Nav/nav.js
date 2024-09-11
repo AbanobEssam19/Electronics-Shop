@@ -20,7 +20,7 @@ function Nav1() {
         <div className={`container ${styles.nav1}`}>
             <Link href="/" className={styles.navHeader}>
                 <div className={styles.logoContainer}>
-                    <img src="../logo.jpg" />
+                    <img src="../logo.png" />
                 </div>
                 <h1>AB Electronics</h1>
             </Link>
@@ -143,9 +143,9 @@ function Nav2() {
 
 export default function Nav() {
     return (
-        <>
+        <div className={styles.main}>
             <Nav1 />
             <Nav2 />
-        </>
+        </div>
     )
 }
