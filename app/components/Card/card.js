@@ -1,4 +1,4 @@
-import styles from "./page.module.css";
+import styles from "./card.module.css";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import Link from "next/link";
 
-export default function Card1() {
+export default function Card() {
     return (
 
             <div className = {`container ${styles.wholeCard}`}>

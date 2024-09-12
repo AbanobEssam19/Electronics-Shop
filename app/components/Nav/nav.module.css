@@ -166,6 +166,7 @@
     border: 1px solid #eef2f6;
     border-radius: 5px;
     min-height: 50px;
+    background-color: white;
 }
 
 .nav2 .mainNav li a:hover {
