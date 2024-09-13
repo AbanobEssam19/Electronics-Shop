@@ -49,7 +49,7 @@
     height: 100%;
     padding: 10px;
     border-radius: 10px 0px 0px 10px;
-    border-color: #EBEDF0;
+    border: 1px #beb9b9 solid;
 }
 
 .searchBtn {
