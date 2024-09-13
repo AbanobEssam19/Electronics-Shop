@@ -30,7 +30,7 @@ function Nav1() {
                 <button className={styles.searchBtn}><FontAwesomeIcon icon="fa-solid fa-magnifying-glass" style={{width: "25px"}} /></button>
             </div>
 
-            <Link href="/" className={styles.navBtns} >
+            <Link href="../pages/Sign" className={styles.navBtns} >
                 <FontAwesomeIcon icon="fa-regular fa-user" style={{width: "30px", height: "25px"}} />
                 <p>Sign in</p>
             </Link>
@@ -61,16 +61,16 @@ function Nav2() {
         <div className={`container-fluid ${styles.nav2}`}>
             <div className={`container ${styles.contentContainer}`} >
                 <ul className={styles.mainNav}>
-                    <li><Link href="#">Home</Link></li>
+                    <li><Link href="/">Home</Link></li>
                     <li className={styles.categoriesLink}>
                         <Link href="/" >Categories <FontAwesomeIcon icon="fa-solid fa-caret-down" /></Link>
                         <div className={styles.categoriesDropDown} >
                             <ul>
-                                <li><Link href="#">Home</Link></li>
+                                <li><Link href="/">Home</Link></li>
                                 <li><Link href="/">Categories</Link></li>
                                 <li><Link href="/">3D Printing</Link></li>
                                 <li><Link href="/">About Us</Link></li>
-                                <li><Link href="#">Home</Link></li>
+                                <li><Link href="/">Home</Link></li>
                                 <li><Link href="../pages/Categories">Categories</Link></li>
                                 <li><Link href="/">3D Printing</Link></li>
                                 <li><Link href="/">About Us</Link></li>

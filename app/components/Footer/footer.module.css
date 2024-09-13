@@ -51,7 +51,7 @@
 }
 
 .socialContainer:hover path {
-    color: #F8C051;
+    color: var(--third);
 }
 
 .pages, .socialSection, .location {

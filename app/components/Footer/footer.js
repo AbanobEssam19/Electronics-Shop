@@ -20,12 +20,12 @@ export default function Footer() {
         <div className={`container-fluid ${styles.footer}`}>
             <div className={` ${styles.footerContent}`} >
                 <div className={styles.logoContainer}>
-                    <img src="../footer-logo.png" />
+                    <img src="../side-bar-logo.png" />
                 </div>
                 <div className={styles.pages}>
                     <h2>Pages</h2>
                     <div className={styles.line} ></div>
-                    <Link href="#">Home</Link>
+                    <Link href="/">Home</Link>
                     <Link href="/">Categories</Link>
                     <Link href="/">3D Printing</Link>
                     <Link href="/">About Us</Link>
