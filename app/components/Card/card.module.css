@@ -68,8 +68,14 @@
      background-color: rgba(128, 128, 128, 0.143);  
 }
 
-
-  
+.closebtn {
+    position: absolute ;
+    right: 30px ;
+    border-radius: 50px ;
+    color: #111 !important;
+    background-color: #fff !important;
+    border: 1px black solid;
+}
 
 .anchor{
     margin-top: 2px;  

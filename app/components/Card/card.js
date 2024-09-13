@@ -4,7 +4,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+
 import Link from "next/link";
+
+library.add(fab, fas, far);
 
 export default function Card() {
     return (
@@ -29,11 +37,11 @@ export default function Card() {
 
                         {/* <!-- Modal --> */}
                             <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                              <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                                <div class="modal-content">
-                                  <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                              <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                                <div class="modal-content"  style={{width: "1000px" ,height: "550px" , marginLeft: "75px"}}>
+                                  <div class="modal-header border-0" style={{position:"relative"}}>
+                                    <h5 class="modal-title" id="exampleModalLongTitle"></h5>
+                                    <button type="button" className={`close ${styles.closebtn}`} data-bs-dismiss="modal" aria-label="Close">
                                       <span aria-hidden="true">&times;</span>
                                     </button>
                                   </div>
@@ -42,7 +50,7 @@ export default function Card() {
                                         <img src= "../card-1.jpg" /> 
                                     </div>
                                   </div>
-                                  <div class="modal-footer">
+                                  <div class="modal-footer border-0">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="button" class="btn btn-primary">Save changes</button>
                                   </div>
@@ -63,9 +71,7 @@ export default function Card() {
                         </p>
                     </div>
                     <button className={styles.shoppingCart}>
-                        <Link href= "/">
                             <FontAwesomeIcon icon="fa-solid fa-cart-shopping" style={{width: "30px", height: "14px" , color: "black" , marginTop : "5px"}} />
-                        </Link>
                     </button>
                 </div>
 
