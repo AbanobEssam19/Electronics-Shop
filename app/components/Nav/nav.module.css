@@ -40,7 +40,7 @@
     display: flex;
     width: 40%;
     height: 40px;
-    background-color: #F8C051;
+    background-color: var(--main);
     border-radius: 10px;
 }
 
@@ -56,7 +56,7 @@
     background-color: transparent;
     border: 0px;
     width: 10%;
-    color: #261A02;
+    color: var(--third);
 }
 
 .navBtns {
@@ -86,7 +86,7 @@
 .counter {
     width: 16px;
     height: 16px;
-    background-color: #F8C051;
+    background-color: var(--main);
     border-radius: 100%;
     position: absolute;
     top: 5px;
@@ -170,7 +170,7 @@
 }
 
 .nav2 .mainNav li a:hover {
-    color: #F8C051;
+    color: var(--main);
 }
 
 .nav2 .categoriesLink:hover .categoriesDropDown {
@@ -238,7 +238,7 @@
 }
 
 .sideBarHeader {
-    background-color: #261A02;
+    background-color: var(--third);
     height: 100px;
     display: flex;
     justify-content: space-between;

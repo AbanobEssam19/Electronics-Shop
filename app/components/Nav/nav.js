@@ -71,7 +71,7 @@ function Nav2() {
                                 <li><Link href="/">3D Printing</Link></li>
                                 <li><Link href="/">About Us</Link></li>
                                 <li><Link href="#">Home</Link></li>
-                                <li><Link href="../Categories/page">Categories</Link></li>
+                                <li><Link href="../pages/Categories">Categories</Link></li>
                                 <li><Link href="/">3D Printing</Link></li>
                                 <li><Link href="/">About Us</Link></li>
                                 <li><Link href="#">Home</Link></li>
