@@ -17,7 +17,7 @@ library.add(fab, fas, far);
 export default function Card() {
     return (
 
-            <div className = {`container ${styles.wholeCard}`}>
+            <div className = {`${styles.wholeCard}`}>
     
                     <div className= {styles.cardImg }>
                         <Link href="/">      
