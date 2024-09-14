@@ -1,0 +1,106 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.main {
+  height: 30vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+#h1 {
+  font-size: 25px;
+  line-height: 2;
+}
+.price {
+  font-size: 30px;
+  position: relative;
+}
+.price::after {
+  content: "EGP 150.00";
+  font-size: 20px;
+  text-decoration: line-through;
+  opacity: 50%;
+  position: absolute;
+  width: 110px;
+  bottom: 0;
+  transform: translate(5px, 20%);
+  -webkit-transform: translate(5px, 20%);
+  -moz-transform: translate(5px, 20%);
+  -ms-transform: translate(5px, 20%);
+  -o-transform: translate(5px, 20%);
+}
+.favourites {
+  background-color: transparent;
+  border: none;
+  display: flex;
+}
+.addBox {
+  max-width: 80%;
+  padding: 15px;
+  border: 0.5px solid black;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.counter {
+  width: 20%;
+  height: 80%;
+  border: 0.5px solid black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.add,
+.remove {
+  background-color: transparent;
+  width: 30%;
+  font-size: 20px;
+  border: none;
+}
+.addButton {
+  color: white;
+  background-color: #ff6600;
+  border: none;
+  width: 120px;
+  padding: 10px;
+  border-radius: 8%;
+  -webkit-border-radius: 8%;
+  -moz-border-radius: 8%;
+  -ms-border-radius: 8%;
+  -o-border-radius: 8%;
+}
+.categories {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 80%;
+}
+.descRevUl {
+  margin: auto;
+  width: 80%;
+  display: flex;
+  list-style-type: none;
+  gap: 30px;
+}
+.descRevUl li {
+  font-size: 20px;
+}
+.active {
+  font-weight: bold;
+}
+.description {
+  margin-top: 20px !important;
+  line-height: 2;
+  width: 77%;
+  margin: auto;
+}
+.productContainer{
+    width: 80%;
+    margin: 15px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
