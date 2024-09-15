@@ -15,8 +15,6 @@ import Link from "next/link";
 
 library.add(fab, fas, far);
 
-import { useState } from "react";
-
 function removeCartItem(e) {
   e.target.closest(`.${styles.cartItemContainer}`).remove();
 }
@@ -72,7 +70,7 @@ function Nav1() {
         </button>
       </div>
 
-      <Link href="../pages/Sign" className={styles.navBtns}>
+      <Link href="../pages/sign" className={styles.navBtns}>
         <FontAwesomeIcon
           icon="fa-regular fa-user"
           style={{ width: "30px", height: "25px" }}
@@ -81,7 +79,7 @@ function Nav1() {
       </Link>
 
       <Link
-        href="/"
+        href="../pages/wishlist"
         className={`${styles.navBtns} ${styles.wishlist}`}
         title="Wishlist"
       >
@@ -228,7 +226,9 @@ function Nav2() {
           </button>
         </div>
 
-        <button className={styles.navBtns}>
+        <button className={styles.navBtns}
+          data-bs-toggle="offcanvas"
+          data-bs-target="#cartSideBar">
           <FontAwesomeIcon
             icon="fa-solid fa-cart-shopping"
             style={{ width: "40px", height: "30px" }}
