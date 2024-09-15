@@ -33,15 +33,15 @@ function Carousel() {
         ></button>
       </div>
 
-      <div className="carousel-inner">
-        <div className="carousel-item active">
-          <img src="../mainCarousel.jpg" className="d-block w-100" />
+      <div className={`carousel-inner ${styles.carouselInner}`}>
+        <div className={`carousel-item active ${styles.carouselItem}`}>
+          <img src="../product1.jpg" className="d-block w-100" />
         </div>
-        <div className="carousel-item">
-          <img src="../shippingCarousel.jpg" className="d-block w-100" />
+        <div className={`carousel-item ${styles.carouselItem}`}>
+          <img src="../product1.jpg" className="d-block w-100" />
         </div>
-        <div className="carousel-item">
-          <img src="../3dPrintingCarousel.jpg" className="d-block w-100" />
+        <div className={`carousel-item ${styles.carouselItem}`}>
+          <img src="../product1.jpg" className="d-block w-100" />
         </div>
       </div>
 

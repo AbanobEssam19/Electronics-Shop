@@ -1,6 +1,7 @@
 .mainContent {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 50px;
   margin-bottom: 50px;
 }
@@ -15,6 +16,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  width: 90%;
 }
 
 .section .header {
@@ -42,9 +44,26 @@
 
 .section .content {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
   width: 100%;
-  margin-top: 20px;
+  padding: 20px 0;
+  position: relative;
+}
 
+.section .content .cardContainer {
+  width: 100%;
+  display: flex;
+  flex-shrink: none;
+  gap: 10px;
+  overflow: hidden;
+  padding: 20px 14px;
+}
+
+.cardContainer > * {
+  flex-shrink: 0;
+}
+
+.content button {
+  background-color: transparent;
+  border: 0;
 }

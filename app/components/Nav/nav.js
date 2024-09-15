@@ -15,6 +15,39 @@ import Link from "next/link";
 
 library.add(fab, fas, far);
 
+import { useState } from "react";
+
+function removeCartItem(e) {
+  e.target.closest(`.${styles.cartItemContainer}`).remove();
+}
+
+function CartItem() {
+  return (
+    <div className={styles.cartItemContainer} >
+      <div className={styles.imgContainer} >
+        <img src="../card-1.jpg" />
+      </div>
+      <div className={styles.itemInfo} >
+        <div className={styles.itemInfoHead}>
+          <p className={styles.title} >AC Light Dimmer SCR (220V-2000W) and AC Motor</p>
+          <button onClick={removeCartItem}>
+            <FontAwesomeIcon
+              icon="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <div className={styles.quantity} >
+          <div className={styles.quantityButtons} >
+            <button>-</button>
+            1
+            <button>+</button>
+          </div>
+          <p className={styles.price} >100.00 EGP</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Nav1() {
   return (
     <div className={`container ${styles.nav1}`}>
@@ -61,7 +94,9 @@ function Nav1() {
         />
       </Link>
 
-      <Link href="/" className={styles.navBtns}>
+      <button className={styles.navBtns}
+          data-bs-toggle="offcanvas"
+          data-bs-target="#cartSideBar">
         <div className={styles.counter}>
           <p>0</p>
         </div>
@@ -69,11 +104,44 @@ function Nav1() {
           icon="fa-solid fa-cart-shopping"
           style={{ width: "40px", height: "30px" }}
         />
-        <div className={styles.cartInfoContainer}>
-          <p>Total</p>
-          <p className={styles.cartTotal}>0.00EGP</p>
+      </button>
+      <div
+        className={`offcanvas offcanvas-end`}
+        id="cartSideBar"
+      >
+        <div className={`offcanvas-header ${styles.cartHeader}`}>
+          <p>CART (1)</p>
+          <button type="button" data-bs-dismiss="offcanvas">
+            <FontAwesomeIcon
+              icon="fa-solid fa-xmark"
+              style={{ width: "20px", height: "20px" }}
+            />
+          </button>
         </div>
-      </Link>
+        <div className={`offcanvas-body ${styles.cartBody}`}>
+          <div className={styles.itemContainer}>
+            <CartItem />
+            <CartItem />
+            <CartItem />
+            <CartItem />
+            <CartItem />
+            <CartItem />
+            <CartItem />
+            <CartItem />
+            <CartItem />
+          </div>
+          <div className={styles.cartFooter}>
+            <div className={styles.total}>
+              <p>TOTAL:</p>
+              <p>100.00 EGP</p>
+            </div>
+            <div className={styles.footerButtons}>
+              <button>VIEW CART</button>
+              <button>CHECKOUT</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
