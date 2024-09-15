@@ -9,6 +9,15 @@
   padding: 20px !important;
 }
 
-.carouselInner, .carouselItem, .carouselItem img {
+.carouselInner,
+.carouselItem,
+.carouselItem img {
   height: 100%;
+}
+
+@media (max-width: 768px) {
+  .parentCarousel {
+    width: 80vw;
+    height: 350px;
+  }
 }
