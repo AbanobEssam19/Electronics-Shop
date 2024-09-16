@@ -133,9 +133,9 @@ function Nav1() {
               <p>TOTAL:</p>
               <p>100.00 EGP</p>
             </div>
-            <div className={styles.footerButtons}>
-              <button>VIEW CART</button>
-              <button>CHECKOUT</button>
+            <div className={styles.footerLinks}>
+              <Link href="../pages/cart">VIEW CART</Link>
+              <Link href="/">CHECKOUT</Link>
             </div>
           </div>
         </div>

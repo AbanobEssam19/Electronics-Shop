@@ -397,20 +397,24 @@
     font-weight: bold;
 }
 
-.cartFooter .footerButtons {
+.cartFooter .footerLinks {
     display: flex;
     justify-content: space-between;
 }
 
-.cartFooter button {
+.cartFooter a {
+    text-decoration: none;
     border: 1px solid var(--main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: transparent;
     width: 155px;
     height: 40px;
     color: var(--main);
 }
 
-.cartFooter button:last-child {
+.cartFooter a:last-of-type {
     background-color: var(--main);
     color: white;
 }
