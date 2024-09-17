@@ -62,12 +62,20 @@
     height: 230px;
 }
 
-.line {
+.footerContent h2 {
+    position: relative;
+    width: fit-content;
+}
+
+.footerContent h2::after {
     content: "";
     width: 85%;
     height: 4px;
     background-color: white;
     border-radius: 20px;
+    position: absolute;
+    bottom: -20px;
+    left: 0;
 }
 
 .pages a {

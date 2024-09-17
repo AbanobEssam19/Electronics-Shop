@@ -196,7 +196,7 @@ function Nav2() {
             <Link href="../pages/Printing">3D Printing</Link>
           </li>
           <li>
-            <Link href="/">About Us</Link>
+            <Link href="../pages/contact">Contact Us</Link>
           </li>
         </ul>
 

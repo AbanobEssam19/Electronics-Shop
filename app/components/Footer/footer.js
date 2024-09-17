@@ -59,7 +59,7 @@ export default function Footer() {
                 <div className={styles.location} >
                     <h2>Location</h2>
                     <div className={styles.line} ></div>
-                    <p><FontAwesomeIcon icon="fa-solid fa-location-dot" style={{width: "20px", height: "20px"}} /> Cairo, Egypt</p>
+                    <p><FontAwesomeIcon icon="fa-solid fa-location-dot" style={{width: "20px", height: "20px"}} /> 132 Shobra street - Cairo - Egypt.</p>
                 </div>
             </div>
             <div className={styles.line}></div>
