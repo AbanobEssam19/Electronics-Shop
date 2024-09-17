@@ -15,11 +15,12 @@ import Link from "next/link";
 
 library.add(fab, fas, far);
 
-function removeCartItem(e) {
-  e.target.closest(`.${styles.cartItemContainer}`).remove();
-}
-
 function CartItem() {
+
+  function removeCartItem(e) {
+    e.target.closest(`.${styles.cartItemContainer}`).remove();
+  }
+
   return (
     <div className={styles.cartItemContainer} >
       <div className={styles.imgContainer} >
