@@ -174,7 +174,7 @@ function Nav2() {
                   <Link href="/">Home</Link>
                 </li>
                 <li>
-                  <Link href="../pages/Categories">Categories</Link>
+                  <Link href="../pages/categories">Categories</Link>
                 </li>
                 <li>
                   <Link href="/">3D Printing</Link>

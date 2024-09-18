@@ -2,11 +2,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px white solid;    
+    border: 1px transparent solid;    
     width: 250px;
     padding: 17px;
     transition: .3s ease;
 }
+
 
 .wholeCard:hover {
     border: 1px rgba(128, 128, 128, 0.143) solid;
