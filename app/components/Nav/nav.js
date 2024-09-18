@@ -15,11 +15,12 @@ import Link from "next/link";
 
 library.add(fab, fas, far);
 
-function removeCartItem(e) {
-  e.target.closest(`.${styles.cartItemContainer}`).remove();
-}
-
 function CartItem() {
+
+  function removeCartItem(e) {
+    e.target.closest(`.${styles.cartItemContainer}`).remove();
+  }
+
   return (
     <div className={styles.cartItemContainer} >
       <div className={styles.imgContainer} >
@@ -195,7 +196,7 @@ function Nav2() {
             <Link href="../pages/Printing">3D Printing</Link>
           </li>
           <li>
-            <Link href="/">About Us</Link>
+            <Link href="../pages/contact">Contact Us</Link>
           </li>
         </ul>
 

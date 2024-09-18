@@ -42,7 +42,7 @@ export default function ProgressBar(props) {
                     <p>{num >= 2 ? check : 2}</p>
                 </div>
                 <div className={styles.processDetails} >
-                    <p>CHECKOUT</p>
+                    <p>SHIPPING AND CHECKOUT</p>
                     <p>Enter your details</p>
                 </div>
                 {num >= 2 ? colored : normal}

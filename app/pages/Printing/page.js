@@ -7,6 +7,7 @@ import Footer from "@/app/components/Footer/footer";
 
 const Printing = () => {
   const [name, setName] = useState("");
+  const [Phone, setPhone] = useState("");
   const [grams, setGrams] = useState("");
   const [color, setColor] = useState("");
   const [quality, setQuality] = useState("");
@@ -17,6 +18,7 @@ const Printing = () => {
 
     console.log({
       name,
+      Phone,
       grams,
       color,
       quality,
@@ -24,6 +26,7 @@ const Printing = () => {
     });
 
     setName("");
+    setPhone("");
     setGrams("");
     setColor("");
     setQuality("");
@@ -37,7 +40,7 @@ const Printing = () => {
         <h1>3D Printing Service Reservation</h1>
         <form onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name">Your Name:</label>
+            <label htmlFor="name">Your Name</label>
             <input
               type="text"
               id="name"
@@ -47,7 +50,17 @@ const Printing = () => {
             />
           </div>
           <div>
-            <label htmlFor="grams">Grams of Parts:</label>
+            <label htmlFor="Phone">Phone Number</label>
+            <input
+              type="number"
+              id="Phone"
+              value={Phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="grams">Grams of Parts</label>
             <input
               type="number"
               id="grams"
@@ -57,7 +70,7 @@ const Printing = () => {
             />
           </div>
           <div>
-            <label htmlFor="color">Filament Color:</label>
+            <label htmlFor="color">Filament Color</label>
             <input
               type="text"
               id="color"
@@ -67,7 +80,7 @@ const Printing = () => {
             />
           </div>
           <div>
-            <label htmlFor="quality">Quality of Filament Needed:</label>
+            <label htmlFor="quality">Quality of Filament Needed</label>
             <input
               type="text"
               id="quality"
@@ -77,7 +90,7 @@ const Printing = () => {
             />
           </div>
           <div>
-            <label htmlFor="file">Part File (STL):</label>
+            <label htmlFor="file">Part File (STL)</label>
             <input
               type="file"
               id="file"
