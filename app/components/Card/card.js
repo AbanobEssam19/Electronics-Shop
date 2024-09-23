@@ -14,7 +14,19 @@ import Link from "next/link";
 
 library.add(fab, fas, far);
 
+import { useState, useRef } from "react";
+
 export default function Card() {
+  const amountRef = useRef();
+
+  function increaseAmount() {
+    amountRef.current.value = parseInt(amountRef.current.value) + 1;
+  }
+
+  function decreaseAmount() {
+    if (amountRef.current.value > 1)
+      amountRef.current.value = amountRef.current.value - 1;
+  }
   return (
     <div className={`${styles.wholeCard}`}>
       <div className={styles.cardImg}>
@@ -57,8 +69,7 @@ export default function Card() {
             role="document"
           >
             <div
-              class="modal-content"
-              style={{ width: "1000px", height: "550px", marginLeft: "75px" }}
+              className={`modal-content ${styles.ModelContent}`}
             >
               <div
                 class="modal-header border-0"
@@ -67,29 +78,66 @@ export default function Card() {
                 <h5 class="modal-title" id="exampleModalLongTitle"></h5>
                 <button
                   type="button"
-                  className={`close ${styles.closebtn}`}
+                  className={`col-1 close ${styles.closebtn}`}
+                  style={{ width: "36px" }}
                   data-bs-dismiss="modal"
                   aria-label="Close"
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div class="modal-body">
-                <div className>
-                  <img src="../card-1.jpg" />
+              <div className={`modal-body ${styles.ModelBody}`}>
+                <div className={styles.LeftPart}>
+                  <Link href="/">
+                    <img src="../card-1.jpg" />
+                  </Link>
                 </div>
-              </div>
-              <div class="modal-footer border-0">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-                <button type="button" class="btn btn-primary">
-                  Save changes
-                </button>
+                <div className={styles.RightPart}>
+                  <h1 className={styles.ProductText}>
+                    AC Light Dimmer SCR (220V-2000W) and AC Motor Speed
+                    Controller Module
+                  </h1>
+                  <div className={styles.state}>
+                    <FontAwesomeIcon
+                      icon="fa-regular fa-circle-check"
+                      style={{ color: "#54ca87" }}
+                    />
+                    <p>In Stock</p>
+                  </div>
+                  <div className={styles.price}>
+                    <p>EGP 100.00 </p>
+                    <del>EGP 135.00 </del>
+                  </div>
+                  <div className={styles.buttonsBox}>
+                    <div className={styles.amountContainer}>
+                      <button onClick={decreaseAmount}>-</button>
+                      <input type="number" value={1} ref={amountRef} />
+                      <button onClick={increaseAmount}>+</button>                   
+                    </div>
+                    <button>Add to cart</button>
+                    <button>
+                      <FontAwesomeIcon icon="fa-regular fa-heart" />
+                      <p>Add to wishlist</p>
+                    </button>
+                  </div>
+                  <div className={styles.cartAmount}>
+                    <FontAwesomeIcon icon="fa-solid fa-bag-shopping" />
+                    <p>
+                      <strong>Other people want this</strong>, x people have
+                      this in their carts right now.
+                    </p>
+                  </div>
+                  <div className={styles.categories}>
+                    <p style={{ display: "inline" }}>categories: </p>
+                    <Link href="/">categories</Link>
+                    <Link href="/">, categories</Link>
+                    <Link href="/">, categories</Link>
+                    <Link href="/">, categories</Link>
+                    <Link href="/">, categories</Link>
+                    <Link href="/">, categories</Link>
+                    <Link href="/">, categories</Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
