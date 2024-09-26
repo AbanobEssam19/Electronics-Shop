@@ -20,6 +20,7 @@ library.add(fab, fas, far);
 import { useState, useRef } from "react";
 
 export default function Main() {
+  const [amount, setAmount] = useState(1);
   const amountRef = useRef();
 
   function increaseAmount() {
@@ -53,7 +54,15 @@ export default function Main() {
             <div className={styles.buttonsBox}>
               <div className={styles.amountContainer}>
                 <button onClick={decreaseAmount}>-</button>
-                <input type="number" value={1} ref={amountRef} />
+                <input
+                  type="number"
+                  value={amount}
+                  ref={amountRef}
+                  onChange={(e) => {
+                    if (e.target.value === "") e.target.value = 1;
+                    setAmount(e.target.value);
+                  }}
+                />
                 <button onClick={increaseAmount}>+</button>
               </div>
               <button>Add to cart</button>

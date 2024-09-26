@@ -65,7 +65,7 @@ function Carousel() {
         </div>
       </div>
 
-      <button className="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+      <button className="carousel-control-prev" type="button" data-bs-target="#mainCarousel " data-bs-slide="prev">
         <span className={`carousel-control-prev-icon ${styles.prevIcon}`}></span>
       </button>
       <button className="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
