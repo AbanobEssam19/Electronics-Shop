@@ -21,19 +21,31 @@ import Footer from "./components/Footer/footer";
 
 import Card from './components/Card/card';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
+
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
       if (typeof window !== 'undefined') {
         import('bootstrap/dist/js/bootstrap.bundle.min.js');
       }
+
+      const fetchUser = async () => {
+        const res = await fetch("/user");
+        const data = await res.json();
+        setUser(data.user);
+        console.log(user);
+      }
+
+      fetchUser();
+
   }, []);
   
   return (
     <div className={styles.mainPage}>
-      <Nav />
+      <Nav user={user} />
       <div className={styles.mainContent}>
         <Carousel />
         <SpecialOffers />

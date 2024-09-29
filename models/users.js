@@ -6,8 +6,8 @@ const Users = mongoose.model('Users',
         password: String,
         name: String,
         email: String,
-        cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' }],
-        whislist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' }],
+        cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Carts' , default: []}],
+        wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' , default: []}],
         address: [String],
         phone: String
     }

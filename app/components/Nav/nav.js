@@ -12,6 +12,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 library.add(fab, fas, far);
 
@@ -47,7 +48,19 @@ function CartItem() {
   )
 }
 
-function Nav1() {
+function Nav1({user}) {
+
+  const cartButton = useRef(null);
+
+  function checkUser(e) {
+    if (user == null) {
+      
+    }
+    else {
+      cartButton.current.click();
+    }
+  }
+
   return (
     <div className={`container ${styles.nav1}`}>
       <Link href="/" className={styles.navHeader}>
@@ -76,7 +89,10 @@ function Nav1() {
           icon="fa-regular fa-user"
           style={{ width: "30px", height: "25px" }}
         />
-        <p>Sign in</p>
+        <div style={{display: "flex", flexDirection: "column"}}>
+          {user != null ? <p style={{color: "gray", fontSize: "small"}}>Welcome</p> : ""}
+          <p style={{fontWeight: "bold"}}>{user != null ? user.username : "Sign in"}</p>
+        </div>
       </Link>
 
       <Link
@@ -85,7 +101,7 @@ function Nav1() {
         title="Wishlist"
       >
         <div className={styles.counter}>
-          <p>0</p>
+          <p>{user != null ? user.wishlist.length : 0}</p>
         </div>
         <FontAwesomeIcon
           icon="fa-regular fa-heart"
@@ -93,23 +109,25 @@ function Nav1() {
         />
       </Link>
 
-      <button className={styles.navBtns}
-          data-bs-toggle="offcanvas"
-          data-bs-target="#cartSideBar">
+      <button className={styles.navBtns} onClick={checkUser}>
         <div className={styles.counter}>
-          <p>0</p>
+          <p>{user != null ? user.cart.length : 0}</p>
         </div>
         <FontAwesomeIcon
           icon="fa-solid fa-cart-shopping"
           style={{ width: "40px", height: "30px" }}
         />
       </button>
+      <button data-bs-toggle="offcanvas"
+          data-bs-target="#cartSideBar"
+          style={{display: "none"}}
+          ref={cartButton}></button>
       <div
         className={`offcanvas offcanvas-end`}
         id="cartSideBar"
       >
         <div className={`offcanvas-header ${styles.cartHeader}`}>
-          <p>CART (1)</p>
+          <p>CART ({user ? user.cart.length : 0})</p>
           <button type="button" data-bs-dismiss="offcanvas">
             <FontAwesomeIcon
               icon="fa-solid fa-xmark"
@@ -145,7 +163,7 @@ function Nav1() {
   );
 }
 
-function Nav2() {
+function Nav2({user}) {
   return (
     <div className={`container-fluid ${styles.nav2}`}>
       <div className={`container ${styles.contentContainer}`}>
@@ -302,7 +320,7 @@ function Nav2() {
           </li>
           <li className={styles.sideNavItem}>
             <Link href="/">
-              <FontAwesomeIcon icon="fa-solid fa-user" /> Sign in
+              <FontAwesomeIcon icon="fa-solid fa-user" /> {user != null ? "My account" : "Sign in"}
             </Link>
           </li>
         </div>
@@ -312,10 +330,23 @@ function Nav2() {
 }
 
 export default function Nav() {
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await fetch("/user");
+      const data = await res.json();
+      setUser(data.user);
+    }
+  
+    fetchUser();
+  }, [])
+
   return (
     <div className={styles.main}>
-      <Nav1 />
-      <Nav2 />
+      <Nav1 user={user} />
+      <Nav2 user={user} />
     </div>
   );
 }
