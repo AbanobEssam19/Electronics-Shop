@@ -57,6 +57,15 @@ function BillingAndShipping() {
           <input type="email" id="email" required></input>
         </div>
       </div>
+      <h6 style={{ fontWeight: "bold" }}>Additional information</h6>
+      <div className={styles.inputWrapper}>
+        <label htmlFor="notes">Order Notes</label>
+        <textarea
+          style={{ borderRadius: "8px", height: "100px", padding: "10px" }}
+          id="notes"
+          placeholder="Notes about your order"
+        ></textarea>
+      </div>
     </form>
   );
 }
@@ -96,9 +105,11 @@ function Order() {
         </tbody>
       </table>
       <div className={styles.group}>
-        <p style={{ fontWeight: "bold" }}>Subtotal</p>
+        <p style={{ fontWeight: "bold" }}>Total</p>
         <p style={{ fontWeight: "bold" }}>EGP 250</p>
       </div>
+      <h6 style={{ fontWeight: "bold" }}>Cash on Delivery</h6>
+      <button>Place Order</button>
     </div>
   );
 }
