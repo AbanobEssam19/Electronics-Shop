@@ -14,6 +14,8 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { useUser } from "@/app/context/UserContext";
+
 library.add(fab, fas, far);
 
 function CartItem() {
@@ -48,7 +50,9 @@ function CartItem() {
   )
 }
 
-function Nav1({user}) {
+function Nav1() {
+
+  const user = useUser();
 
   const cartButton = useRef(null);
 
@@ -60,6 +64,13 @@ function Nav1({user}) {
       cartButton.current.click();
     }
   }
+
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  }
+
+  const closeButton = useRef(null);
 
   return (
     <div className={`container ${styles.nav1}`}>
@@ -128,7 +139,7 @@ function Nav1({user}) {
       >
         <div className={`offcanvas-header ${styles.cartHeader}`}>
           <p>CART ({user ? user.cart.length : 0})</p>
-          <button type="button" data-bs-dismiss="offcanvas">
+          <button type="button" data-bs-dismiss="offcanvas" ref={closeButton}>
             <FontAwesomeIcon
               icon="fa-solid fa-xmark"
               style={{ width: "20px", height: "20px" }}
@@ -159,11 +170,15 @@ function Nav1({user}) {
           </div>
         </div>
       </div>
+      <button onClick={logout} style={user ? {} : {display: "none"}}>
+        Logout
+      </button>
     </div>
   );
 }
 
-function Nav2({user}) {
+function Nav2() {
+  const user = useUser();
   return (
     <div className={`container-fluid ${styles.nav2}`}>
       <div className={`container ${styles.contentContainer}`}>
@@ -273,7 +288,7 @@ function Nav2({user}) {
         </div>
         <div className={`offcanvas-body ${styles.sideBarBody}`}>
           <li className={styles.sideNavItem}>
-            <Link href="#">
+            <Link href="/">
               <FontAwesomeIcon icon="fa-solid fa-house" /> Home
             </Link>
           </li>
@@ -294,7 +309,7 @@ function Nav2({user}) {
               <Link href="#">Home</Link>
             </li>
             <li className={styles.sideNavItem}>
-              <Link href="/">Categories</Link>
+              <Link href="/pages/categories">Categories</Link>
             </li>
             <li className={styles.sideNavItem}>
               <Link href="/">3D Printing</Link>
@@ -304,22 +319,22 @@ function Nav2({user}) {
             </li>
           </div>
           <li className={styles.sideNavItem}>
-            <Link href="/">
+            <Link href="/pages/Printing">
               <FontAwesomeIcon icon="fa-brands fa-unity" /> 3D Printing
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/">
-              <FontAwesomeIcon icon="fa-solid fa-address-card" /> About Us
+            <Link href="/pages/contact">
+              <FontAwesomeIcon icon="fa-solid fa-address-card" /> Contact Us
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/">
+            <Link href="/pages/wishlist">
               <FontAwesomeIcon icon="fa-solid fa-heart" /> Wishlist
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/">
+            <Link href="/pages/sign">
               <FontAwesomeIcon icon="fa-solid fa-user" /> {user != null ? "My account" : "Sign in"}
             </Link>
           </li>
@@ -330,23 +345,10 @@ function Nav2({user}) {
 }
 
 export default function Nav() {
-
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const res = await fetch("/user");
-      const data = await res.json();
-      setUser(data.user);
-    }
-  
-    fetchUser();
-  }, [])
-
   return (
     <div className={styles.main}>
-      <Nav1 user={user} />
-      <Nav2 user={user} />
+      <Nav1 />
+      <Nav2 />
     </div>
   );
 }

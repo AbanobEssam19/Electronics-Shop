@@ -34,7 +34,6 @@ export default function Main() {
 
   return (
     <>
-      <Nav />
       <div className={`container ${styles.main}`}>
         <div className={styles.product}>
           <Carousel />
@@ -118,7 +117,6 @@ export default function Main() {
         </div>
         <RelatedProducts />
       </div>
-      <Footer />
     </>
   );
 }

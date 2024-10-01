@@ -1,29 +1,47 @@
 const express = require('express');
 const next = require('next');
+
 const bcrypt = require('bcrypt');
-const session = require('express-session');
+
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+const cloudinary = require('cloudinary').v2;
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME
+})
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
+
 const users = require('./models/users');
+const products = require('./models/products');
 
 const server = express();
 
 server.use(express.json());
 
-server.use(session({
-    secret: '9f8c7e4a8d5b6c3b4e9d2a8f2e6b1c7e3a4d5f1a3b4e6f9d5a8e4c3b2f7a8e1',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
-}));
-
-
 require("./mongodb");
 
+const authenticateToken = (req, res, next) => {
+    const token = req.headers['authorization'];
+
+    if (!token) {
+        return res.status(401).json({success: false});
+    }
+
+    jwt.verify(token,process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({success: false});
+        }
+
+        req.user = user;
+        next();
+    })
+}
+
 app.prepare().then(() => {
-    // Handle custom API or Express routes here if needed
 
     server.post("/register", async (req, res) => {
 
@@ -48,12 +66,12 @@ app.prepare().then(() => {
         await users.insertMany([data]);
 
         let userID = (await users.findOne({username: req.body.username})).id;
-
-        req.session.user = {
-            id: userID
-        };
-
-        res.status(200).json({success: true});
+        const token = jwt.sign(
+            {id: userID}, 
+            process.env.JWT_SECRET,
+            {expiresIn: '14d'}
+        )
+        res.status(200).json({success: true, token});
 
     });
 
@@ -68,12 +86,12 @@ app.prepare().then(() => {
         const checkPass = await bcrypt.compare(req.body.password, targetUser.password);
 
         if (checkPass) {
-            req.session.user = {
-                id: targetUser._id
-            };
-            res.status(200).json({success: true});
-
-            console.log("Session after login:", req.session);
+            const token = jwt.sign(
+                {id: targetUser._id}, 
+                process.env.JWT_SECRET,
+                {expiresIn: '14d'}
+            );
+            res.status(200).json({success: true, token});
         }
         else {
             res.status(404).json({success: false});
@@ -81,19 +99,44 @@ app.prepare().then(() => {
 
     });
 
-    server.get("/user", async (req, res) => {
-        if (req.session.user) {
-            let user = await users.findById(req.session.user.id);
-            return res.status(200).json({ user: user });
+    server.post("/api/uploadproduct", async (req, res) => {
+
+        const photos = [];
+
+        for (let i = 0; i < req.body.photo.length; i++) { 
+            const photoUrl = cloudinary.url(req.body.photo[i]);
+            photos.push(photoUrl);
         }
-        return res.status(401).json({ user: null });
+
+        const date = new Date();
+
+        const data = {
+            name: req.body.name,
+            categories: req.body.categories,
+            price: req.body.price,
+            discount: req.body.discount,
+            date: date,
+            photo: photos,
+            quantity: req.body.quantity,
+            description: req.body.description,
+            specifications: req.body.specifications,
+            popularity: 0
+        }
+
+
+        await products.insertMany([data]);
+    })
+
+    server.get("/api/products", async (req, res) => {
+        const product = await products.find();
+        return res.status(200).json({ products: product });
     });
 
-    server.get('/logout', (req, res) => {
-        req.session.destroy(() => {
-            res.redirect('/');
-        });
+    server.get("/api/user", authenticateToken, async (req, res) => {
+        let user = await users.findById(req.user.id);
+        return res.status(200).json({ user: user });
     });
+
 
     // For all other routes, use Next.js' default handler
     server.get('*', (req, res) => {

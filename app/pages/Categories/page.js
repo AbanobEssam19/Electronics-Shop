@@ -33,7 +33,6 @@ export default function Categories() {
 
   return (
     <>
-      <Nav />
       <div className={`container`} style={{ minHeight: "1000px" }}>
         <div className={`row ${styles.FirstRow}`}>
           <div className={`col-8 ${styles.LeftPart}`}>
@@ -261,7 +260,6 @@ export default function Categories() {
           </nav>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

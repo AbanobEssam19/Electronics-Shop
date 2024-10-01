@@ -14,25 +14,19 @@ import Link from "next/link";
 
 library.add(fab, fas, far);
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
-export default function Card() {
-  const amountRef = useRef();
-
-  function increaseAmount() {
-    amountRef.current.value = parseInt(amountRef.current.value) + 1;
+export default function Card({ product }) {
+  if (!product) {
+    return <div>Loading...</div>;  // Fallback in case product is still undefined
   }
 
-  function decreaseAmount() {
-    if (amountRef.current.value > 1)
-      amountRef.current.value = amountRef.current.value - 1;
-  }
   return (
     <div className={`${styles.wholeCard}`}>
       <div className={styles.cardImg}>
         <Link href="/pages/product">
-          <img src="../card-1.jpg" />
-          <div className={styles.discount}>26%</div>
+          <img src={product.photo[0]} />
+          <div className={styles.discount}>{product.discount}%</div>
         </Link>
         <Link href="/" className={styles.wish}>
           <div className={styles.wishList}>
@@ -55,103 +49,18 @@ export default function Card() {
           />
         </button>
 
-        {/* <!-- Modal --> */}
-        <div
-          class="modal fade"
-          id="exampleModalCenter"
-          tabindex="-1"
-          role="dialog"
-          aria-labelledby="exampleModalCenterTitle"
-          aria-hidden="true"
-        >
-          <div
-            class="modal-dialog modal-dialog-centered modal-xl"
-            role="document"
-          >
-            <div
-              className={`modal-content ${styles.ModelContent}`}
-            >
-              <div
-                class="modal-header border-0"
-                style={{ position: "relative" }}
-              >
-                <h5 class="modal-title" id="exampleModalLongTitle"></h5>
-                <button
-                  type="button"
-                  className={`col-1 close ${styles.closebtn}`}
-                  style={{ width: "36px" }}
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div className={`modal-body ${styles.ModelBody}`}>
-                <div className={styles.LeftPart}>
-                  <Link href="/">
-                    <img src="../card-1.jpg" />
-                  </Link>
-                </div>
-                <div className={styles.RightPart}>
-                  <h1 className={styles.ProductText}>
-                    AC Light Dimmer SCR (220V-2000W) and AC Motor Speed
-                    Controller Module
-                  </h1>
-                  <div className={styles.state}>
-                    <FontAwesomeIcon
-                      icon="fa-regular fa-circle-check"
-                      style={{ color: "#54ca87" }}
-                    />
-                    <p>In Stock</p>
-                  </div>
-                  <div className={styles.price}>
-                    <p>EGP 100.00 </p>
-                    <del>EGP 135.00 </del>
-                  </div>
-                  <div className={styles.buttonsBox}>
-                    <div className={styles.amountContainer}>
-                      <button onClick={decreaseAmount}>-</button>
-                      <input type="number" value={1} ref={amountRef} />
-                      <button onClick={increaseAmount}>+</button>                   
-                    </div>
-                    <button>Add to cart</button>
-                    <button>
-                      <FontAwesomeIcon icon="fa-regular fa-heart" />
-                      <p>Add to wishlist</p>
-                    </button>
-                  </div>
-                  <div className={styles.cartAmount}>
-                    <FontAwesomeIcon icon="fa-solid fa-bag-shopping" />
-                    <p>
-                      <strong>Other people want this</strong>, x people have
-                      this in their carts right now.
-                    </p>
-                  </div>
-                  <div className={styles.categories}>
-                    <p style={{ display: "inline" }}>categories: </p>
-                    <Link href="/">categories</Link>
-                    <Link href="/">, categories</Link>
-                    <Link href="/">, categories</Link>
-                    <Link href="/">, categories</Link>
-                    <Link href="/">, categories</Link>
-                    <Link href="/">, categories</Link>
-                    <Link href="/">, categories</Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Modal product={product} />
+
       </div>
       <Link href="/" className={styles.anchor}>
-        <h3 className={styles.title}>AC Light Dimmer SCR (220V-2000W) and</h3>
+        <h3 className={styles.title}>{product.name}</h3>
       </Link>
       <div className={styles.lowerPart}>
         <div className={styles.price}>
           <p>
-            <span>EGP135.00</span>
+            <span>{Math.floor((product.price / (100 - product.discount)) * 100)}.00EGP</span>
             <br />
-            EGP100.00
+            {product.price}.00EGP
           </p>
         </div>
         <button className={styles.shoppingCart}>
@@ -165,6 +74,124 @@ export default function Card() {
             }}
           />
         </button>
+      </div>
+    </div>
+  );
+}
+
+
+function Modal({ product }) {
+  
+  const [name, setName] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [price, setPrice] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [photo, setPhoto] = useState([]);
+  const [quantity, setQuantity] = useState("");
+  const [popularity, setPopularity] = useState("");
+
+
+  useEffect(() => {
+    setName(product.name);
+    setCategories(product.categories);
+    setPrice(product.price);
+    setDiscount(product.discount);
+    setPhoto(product.photo);
+    setQuantity(product.quantity);
+    setPopularity(product.popularity);
+  }, [product]);
+
+
+  const amountRef = useRef();
+
+  function increaseAmount() {
+    amountRef.current.value = parseInt(amountRef.current.value) + 1;
+  }
+
+  function decreaseAmount() {
+    if (amountRef.current.value > 1)
+      amountRef.current.value = amountRef.current.value - 1;
+  }
+  return (
+    <div
+      className="modal fade"
+      id="exampleModalCenter"
+      tabIndex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
+      <div
+        className="modal-dialog modal-dialog-centered modal-xl"
+        role="document"
+      >
+        <div
+          className={`modal-content ${styles.ModelContent}`}
+        >
+          <div
+            className="modal-header border-0"
+            style={{ position: "relative" }}
+          >
+            <h5 className="modal-title" id="exampleModalLongTitle"></h5>
+            <button
+              type="button"
+              className={`col-1 close ${styles.closebtn}`}
+              style={{ width: "36px" }}
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div className={`modal-body ${styles.ModelBody}`}>
+            <div className={styles.LeftPart}>
+              <Link href="/">
+                <img src={photo[0]} />
+              </Link>
+            </div>
+            <div className={styles.RightPart}>
+              <h1 className={styles.ProductText}>
+                {name}
+              </h1>
+              <div className={styles.state}>
+                <FontAwesomeIcon
+                  icon="fa-regular fa-circle-check"
+                  style={{ color: "#54ca87" }}
+                />
+                <p>In Stock</p>
+              </div>
+              <div className={styles.price}>
+                <p>{price}.00 EGP</p>
+                <del>{Math.floor((price / (100 - discount)) * 100)}.00 EGP</del>
+              </div>
+              <div className={styles.buttonsBox}>
+                <div className={styles.amountContainer}>
+                  <button onClick={decreaseAmount}>-</button>
+                  <input type="number" value={1} ref={amountRef} />
+                  <button onClick={increaseAmount}>+</button>
+                </div>
+                <button>Add to cart</button>
+                <button>
+                  <FontAwesomeIcon icon="fa-regular fa-heart" />
+                  <p>Add to wishlist</p>
+                </button>
+              </div>
+              <div className={styles.cartAmount}>
+                <FontAwesomeIcon icon="fa-solid fa-bag-shopping" />
+                <p>
+                  <strong>Other people want this</strong>, {popularity} people have
+                  this in their carts right now.
+                </p>
+              </div>
+              <div className={styles.categories}>
+                <p style={{ display: "inline" }}>categories: </p>
+                {categories.map((category) => (
+                  <Link href="/pages/categories" >{category} </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

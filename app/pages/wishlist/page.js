@@ -13,9 +13,6 @@ import { far } from "@fortawesome/free-regular-svg-icons";
 
 import Link from "next/link";
 
-import Nav from "@/app/components/Nav/nav";
-import Footer from "@/app/components/Footer/footer";
-
 import { useEffect, useState } from "react";
 
 library.add(fab, fas, far);
@@ -51,26 +48,14 @@ function WishlistItem() {
 
 export default function Wishlist() {
 
-    const [user, setUser] = useState(null);
-
     useEffect(() => {
         if (typeof window !== 'undefined') {
             import('bootstrap/dist/js/bootstrap.bundle.min.js');
         }
-
-        const fetchUser = async () => {
-            const res = await fetch("/user");
-            const data = await res.json();
-            setUser(data.user);
-            console.log(user);
-        }
-
-        fetchUser()
     }, []);
 
     return (
         <>
-            <Nav />
             <div className={`container ${styles.main}`} >
                 <h1>Your Wishlist</h1>
                 <table>
@@ -110,7 +95,6 @@ export default function Wishlist() {
                     </div>
                 </div>
             </div>
-            <Footer />
         </>
     )
 }

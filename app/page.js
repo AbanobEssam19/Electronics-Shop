@@ -23,35 +23,24 @@ import Card from './components/Card/card';
 
 import { useEffect, useRef, useState } from "react";
 
-export default function Home() {
+import { useUser } from './context/UserContext';
+import { useProduct } from './context/ProductContext';
 
-  const [user, setUser] = useState(null);
+export default function Home() {
 
   useEffect(() => {
       if (typeof window !== 'undefined') {
         import('bootstrap/dist/js/bootstrap.bundle.min.js');
       }
-
-      const fetchUser = async () => {
-        const res = await fetch("/user");
-        const data = await res.json();
-        setUser(data.user);
-        console.log(user);
-      }
-
-      fetchUser();
-
   }, []);
   
   return (
     <div className={styles.mainPage}>
-      <Nav user={user} />
       <div className={styles.mainContent}>
         <Carousel />
         <SpecialOffers />
         <NewProducts />
       </div>
-      <Footer />
     </div>
   );
 }
@@ -59,7 +48,7 @@ export default function Home() {
 function Carousel() {
   return (
     <div id="mainCarousel" className="carousel slide" data-bs-ride="carousel">
-      <div className="carousel-indicators">
+      <div className={`carousel-indicators ${styles.marginZero}`}>
         <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="0" className="active"></button>
         <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="1"></button>
         <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="2"></button>
@@ -88,6 +77,15 @@ function Carousel() {
 }
 
 function SpecialOffers() {
+
+  const products = useProduct();
+  const [sorted, setSorted] = useState([]);
+
+  useEffect(() => {
+    const discountSorted = [...products].sort((a, b) => b.discount - a.discount);
+    setSorted(discountSorted);
+  }, [products]);
+
   
   const container = useRef();
 
@@ -108,14 +106,11 @@ function SpecialOffers() {
       <div className={styles.content} >
         <button onClick={slideLeft}>&lt;</button>
         <div className={styles.cardContainer} ref={container} >
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
+          {
+            sorted.slice(0, Math.min(sorted.length, 10)).map((product) => (
+              <Card key={product.id} product={product} />
+            ))
+          }
         </div>
         <button onClick={slideRight}>&gt;</button>
       </div>
@@ -124,6 +119,14 @@ function SpecialOffers() {
 }
 
 function NewProducts() {
+
+  const products = useProduct();
+  const [sorted, setSorted] = useState([]);
+
+  useEffect(() => {
+    const dateSorted = [...products].sort((a, b) => new Date(b.date) - new Date(a.date));
+    setSorted(dateSorted);
+  }, [products]);
 
   const container = useRef();
 
@@ -144,14 +147,11 @@ function NewProducts() {
       <div className={styles.content} >
         <button onClick={slideLeft}>&lt;</button>
         <div className={styles.cardContainer} ref={container} >
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
+          {
+            sorted.slice(0, Math.min(sorted.length, 10)).map((product) => (
+              <Card key={product.id} product={product} />
+            ))
+          }
         </div>
         <button onClick={slideRight}>&gt;</button>
       </div>

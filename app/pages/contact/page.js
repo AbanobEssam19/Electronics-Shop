@@ -30,7 +30,6 @@ export default function Contact() {
 
     return (
         <>
-            <Nav />
             <section className={styles["contact-page-section"]}>
                 <div className={styles["container"]}>
                     <div className={styles["sec-title"]}>
@@ -97,7 +96,6 @@ export default function Contact() {
                     </div>
                 </div>
             </section>
-            <Footer />
         </>
     );
 }

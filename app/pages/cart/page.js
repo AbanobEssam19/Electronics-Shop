@@ -15,8 +15,6 @@ import Link from "next/link";
 
 library.add(fab, fas, far);
 
-import Nav from '@/app/components/Nav/nav';
-import Footer from '@/app/components/Footer/footer';
 import ProgressBar from '@/app/components/ProgressBar/bar';
 
 import { useRef } from 'react';
@@ -69,7 +67,6 @@ export default function ShoppingCart() {
 
     return (
         <>
-            <Nav />
             <div className={`container ${styles.main}`} >
                 <ProgressBar step={1} />
                 <div className={styles.content} >
@@ -122,7 +119,6 @@ export default function ShoppingCart() {
                     </div>
                 </div>
             </div>
-            <Footer />
         </>
     )
 }
