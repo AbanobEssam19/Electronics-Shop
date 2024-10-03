@@ -63,6 +63,8 @@ function Nav1({user}) {
 
   const closeButton = useRef(null);
 
+  const [searchValue, setSearchValue] = useState("");
+
   return (
     <div className={`container ${styles.nav1}`}>
       <Link href="/" className={styles.navHeader}>
@@ -77,13 +79,13 @@ function Nav1({user}) {
           type="text"
           className={styles.searchBar}
           placeholder="Search for products..."
+          onChange={(e) => setSearchValue(e.target.value)}
         />
-        <button className={styles.searchBtn}>
+        <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`}>
           <FontAwesomeIcon
             icon="fa-solid fa-magnifying-glass"
-            style={{ width: "25px" }}
           />
-        </button>
+        </Link>
       </div>
 
       <Link href="../pages/sign" className={styles.navBtns}>
@@ -170,6 +172,9 @@ function Nav1({user}) {
 
 function Nav2({user}) {
   const closeMenuButton = useRef(null);
+
+  const [searchValue, setSearchValue] = useState("");
+
   return (
     <div className={`container-fluid ${styles.nav2}`}>
       <div className={`container ${styles.contentContainer}`}>
@@ -197,6 +202,9 @@ function Nav2({user}) {
                 </li>
                 <li>
                   <Link href="/pages/products?category=sensor">Sensors</Link>
+                </li>
+                <li>
+                  <Link href="/pages/products?category=microcontroller">Microcontrollers</Link>
                 </li>
               </ul>
             </div>
@@ -227,13 +235,13 @@ function Nav2({user}) {
             type="text"
             className={styles.searchBar}
             placeholder="Search for products..."
+            onChange={(e) => setSearchValue(e.target.value)}
           />
-          <button type="submit" className={styles.searchBtn}>
+          <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`}>
             <FontAwesomeIcon
               icon="fa-solid fa-magnifying-glass"
-              style={{ width: "25px" }}
             />
-          </button>
+          </Link>
         </div>
 
         <button className={styles.navBtns}
@@ -295,6 +303,9 @@ function Nav2({user}) {
             </li>
             <li className={styles.sideNavItem}>
               <Link href="/pages/products?category=sensor" onClick={() => closeMenuButton.current.click()}>Sensors</Link>
+            </li>
+            <li className={styles.sideNavItem}>
+              <Link href="/pages/products?category=microcontroller" onClick={() => closeMenuButton.current.click()}>Microcontrollers</Link>
             </li>
           </div>
           <li className={styles.sideNavItem}>

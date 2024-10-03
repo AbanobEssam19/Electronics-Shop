@@ -19,7 +19,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from "next/link";
 import Modal from "@/app/components/Modal/modal";
 
-export default function Categories() {
+export default function Products() {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(0);
 
@@ -36,13 +36,19 @@ export default function Categories() {
 
   const [startInd, setStartInd] = useState(0);
   
-  const arrSize = 12;
+  const arrSize = 2;
 
   const [paginationLinks, setPaginationLinks] = useState([]);
 
   const paginationRef = useRef(null);
 
   const [currentProduct, setCurrentProduct] = useState(null);
+
+  const [title, setTitle] = useState("");
+
+  const search = searchParams.get('search');
+
+  
 
   function reset() {
     document.getElementById("stock").checked = false;
@@ -56,12 +62,22 @@ export default function Categories() {
   }
 
   useEffect(() => {
+    if (search != null) {
+      setTitle(`Searching result for: "${search}"`);
+    }
+    else {
+      setTitle(`Products for category: ${category.toUpperCase()}`);
+    }
     reset();
 
     let temp = [];
     let mx = 0;
     for (let i = 0; i < products.length; i++) {
       if (category == "all") {
+        mx = Math.max(mx, products[i].price);
+        temp.push(products[i]);
+      }
+      else if (search && products[i].name.toLowerCase().includes(search.toLowerCase())) {
         mx = Math.max(mx, products[i].price);
         temp.push(products[i]);
       }
@@ -153,118 +169,118 @@ export default function Categories() {
 
   useEffect(() => {
     const temp = [];
-    console.log(sorted);
     for (let i = 0; i < sorted.length; i++) {
       if (sorted[i].price >= minPrice && checkSale(sorted[i]) && checkStock(sorted[i])) {
         temp.push(sorted[i]);
       }
     }
 
-    console.log(temp);
     setCurrent([...temp]);
-    console.log(current);
     setStartInd(0);
   }, [minPrice, onSale, onStock, sortBy, sorted]);
 
   return (
     <>
       <div className={`container`}>
-        <div className={`row ${styles.FirstRow}`}>
-          <div className={`col-10 ${styles.LeftPart}`}>
-            {/* <!-- Offcanvas Sidebar --> */}
-            <div className="offcanvas offcanvas-start" id="demo" style={{width: "300px"}}>
-              <div className="offcanvas-header">
-                <h6
-                  style={{
-                    borderBottom: "1px solid #e3e1e1",
-                    padding: "15px  0px 10px 0px",
-                    width: "104%",
-                  }}
-                >
-                  Filter Products
-                </h6>
-                <button
-                  type="button"
-                  className="btn-close text-reset"
-                  data-bs-dismiss="offcanvas"
-                  style={{ border: "1px black solid", borderRadius: "20px" }}
-                ></button>
-              </div>
-              <div className={`offcanvas-body`}>
-                <p
-                  style={{
-                    borderBottom: "1px solid #e3e1e1",
-                    padding: "25px  0px 10px 0px",
-                    width: "104%",
-                  }}
-                >
-                  Filter by price
-                </p>
-                <div className={styles.FilterPart}>
-                  <p style={{ marginTop: "20px" }}>
-                    <span style={{ color: "grey" }}>Price: </span>{minPrice} EGP — {maxPrice} EGP
+        <div className={`${styles.FirstRow}`}>
+          <p className={styles.title}>{title}</p>
+          <div className={styles.filterButtons}>
+            <div className={`${styles.LeftPart}`}>
+              {/* <!-- Offcanvas Sidebar --> */}
+              <div className="offcanvas offcanvas-start" id="demo" style={{width: "300px"}}>
+                <div className="offcanvas-header">
+                  <h6
+                    style={{
+                      borderBottom: "1px solid #e3e1e1",
+                      padding: "15px  0px 10px 0px",
+                      width: "104%",
+                    }}
+                  >
+                    Filter Products
+                  </h6>
+                  <button
+                    type="button"
+                    className="btn-close text-reset"
+                    data-bs-dismiss="offcanvas"
+                    style={{ border: "1px black solid", borderRadius: "20px" }}
+                  ></button>
+                </div>
+                <div className={`offcanvas-body`}>
+                  <p
+                    style={{
+                      borderBottom: "1px solid #e3e1e1",
+                      padding: "25px  0px 10px 0px",
+                      width: "104%",
+                    }}
+                  >
+                    Filter by price
                   </p>
-                </div>
+                  <div className={styles.FilterPart}>
+                    <p style={{ marginTop: "20px" }}>
+                      <span style={{ color: "grey" }}>Price: </span>{minPrice} EGP — {maxPrice} EGP
+                    </p>
+                  </div>
 
-                <input
-                  type="range"
-                  min="0"
-                  max={maxPrice}
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                  className={styles.FilterSlider}
-                />
+                  <input
+                    type="range"
+                    min="0"
+                    max={maxPrice}
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    className={styles.FilterSlider}
+                  />
 
-                <div
-                  style={{
-                    borderBottom: "1px solid #e3e1e1",
-                    marginBottom: "15px",
-                    height: "35px",
-                    width: "104%",
-                  }}
-                >
-                  <p style={{ marginTop: "70px" }}>Product Status</p>
-                </div>
-                <div>
-                <input type="checkbox" value="stock" id="stockCanvas" onChange={(e) => setOnStock(e.target.checked)} />
-                <label htmlFor="stockCanvas" style={{ padding: "10px", fontSize: "15px" }}>
-                  In Stock
-                </label>
-                <br />
-                <input type="checkbox" value="sale" id="saleCanvas" onChange={(e) => setOnSale(e.target.checked)} />
-                <label
-                  htmlFor="saleCanvas"
-                  style={{ padding: " 0px 10px", fontSize: "15px" }}
-                >
-                  On Sale
-                </label>
+                  <div
+                    style={{
+                      borderBottom: "1px solid #e3e1e1",
+                      marginBottom: "15px",
+                      height: "35px",
+                      width: "104%",
+                    }}
+                  >
+                    <p style={{ marginTop: "70px" }}>Product Status</p>
+                  </div>
+                  <div>
+                  <input type="checkbox" value="stock" id="stockCanvas" onChange={(e) => setOnStock(e.target.checked)} />
+                  <label htmlFor="stockCanvas" style={{ padding: "10px", fontSize: "15px" }}>
+                    In Stock
+                  </label>
                   <br />
+                  <input type="checkbox" value="sale" id="saleCanvas" onChange={(e) => setOnSale(e.target.checked)} />
+                  <label
+                    htmlFor="saleCanvas"
+                    style={{ padding: " 0px 10px", fontSize: "15px" }}
+                  >
+                    On Sale
+                  </label>
+                    <br />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* <!-- Button to open the offcanvas sidebar --> */}
-            <button
-              className={`btn btn-primary ${styles.SideFilters}`}
-              type="button"
-              data-bs-toggle="offcanvas"
-              data-bs-target="#demo"
-            >
-              <FontAwesomeIcon
-                icon="fa-solid fa-filter"
-                style={{ color: "#000000" }}
-              />{" "}
-              Filter Products
-            </button>
-          </div>
-          <div className={`col-2 ${styles.RightPart}`}>
-            <div>
-              <select name="sort" id="sort" className={styles.SortIcon} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="latest" id="latest">Sort By Latest</option>
-                <option value="popularity">Sort By popularity </option>
-                <option value="price">Sort By price: low to high</option>
-                <option value="priceRev">Sort By price: high to low </option>
-              </select>
+              {/* <!-- Button to open the offcanvas sidebar --> */}
+              <button
+                className={`btn btn-primary ${styles.SideFilters}`}
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#demo"
+              >
+                <FontAwesomeIcon
+                  icon="fa-solid fa-filter"
+                  style={{ color: "#000000" }}
+                />{" "}
+                Filter Products
+              </button>
+            </div>
+            <div className={`${styles.RightPart}`}>
+              <div>
+                <select name="sort" id="sort" className={styles.SortIcon} onChange={(e) => setSortBy(e.target.value)}>
+                  <option value="latest" id="latest">Sort By Latest</option>
+                  <option value="popularity">Sort By popularity </option>
+                  <option value="price">Sort By price: low to high</option>
+                  <option value="priceRev">Sort By price: high to low </option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -322,7 +338,7 @@ export default function Categories() {
           </div>
           <div className={`col-9 ${styles.ProductsList}`}>
             {
-              current.slice(startInd, Math.min(current.length, startInd + arrSize)).map((product) => (
+              current.slice(startInd * arrSize, Math.min(current.length, (startInd + 1) * arrSize)).map((product) => (
                 checkSale(product) && checkStock(product) && product.price >= minPrice && product.price <= maxPrice && <Card key={product.id} product={product} setCurrentProduct={setCurrentProduct} />
               ))
             }

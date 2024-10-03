@@ -2,7 +2,14 @@
     border-bottom: 1px solid #e3e1e1 ;
     margin-top: 20px;
     width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
 
+.filterButtons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .RightPart {
@@ -147,7 +154,6 @@
     .ProductsList{
         grid-template-columns: repeat(2, auto);
         gap: 10px;
-
     }
 
     .LeftPart {
@@ -159,14 +165,7 @@
 
 @media (max-width: 505px) {
     .SortIcon {
-        display: none;
-    }
-    
-    .LeftPart {
-        display: flex;
-        justify-content: center;
-        padding-left: 50px;
-        width: 100%;
+        margin: auto;
     }
 
     .ProductsList {

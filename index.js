@@ -8,8 +8,23 @@ require('dotenv').config();
 
 const cloudinary = require('cloudinary').v2;
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 })
+
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'projectImages');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+})
+
+const multerMiddelware = multer({storage: storage});
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -99,27 +114,29 @@ app.prepare().then(() => {
 
     });
 
-    server.post("/api/uploadproduct", async (req, res) => {
+    server.post("/api/uploadproduct", multerMiddelware.array('photos'), async (req, res) => {
 
-        const photos = [];
+        const {name, categories, price, discount, quantity, description, specifications} = req.body;
 
-        for (let i = 0; i < req.body.photo.length; i++) { 
-            const photoUrl = cloudinary.url(req.body.photo[i]);
-            photos.push(photoUrl);
-        }
+        const uploadPromises = req.files.map(async (file) => {
+            const photo = await cloudinary.uploader.upload(file.path, {folder: 'products'});
+            return cloudinary.url(photo.public_id);
+        });
+
+        const photos = await Promise.all(uploadPromises);
 
         const date = new Date();
 
         const data = {
-            name: req.body.name,
-            categories: req.body.categories,
-            price: req.body.price,
-            discount: req.body.discount,
+            name: name,
+            categories: categories,
+            price: price,
+            discount: discount,
             date: date,
             photo: photos,
-            quantity: req.body.quantity,
-            description: req.body.description,
-            specifications: req.body.specifications,
+            quantity: quantity,
+            description: description,
+            specifications: specifications,
             popularity: 0
         }
 

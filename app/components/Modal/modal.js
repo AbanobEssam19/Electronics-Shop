@@ -45,8 +45,6 @@ export default function Modal(product) {
     return <h1>Loading...</h1>
   }
 
-  console.log(product.currentProduct);
-
   return (
     
     <div
