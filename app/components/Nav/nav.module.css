@@ -122,6 +122,15 @@
     color: black;
 }
 
+.nav2 li button {
+    background-color: transparent;
+    border: 0;
+}
+
+.nav2 li button:hover {
+    color: var(--main);
+}
+
 .nav2 .mainNav {
     display: flex;
     gap: 50px;
@@ -138,7 +147,6 @@
     z-index: 999;
     width: 80vw;
     left: -98%;
-    padding-top: 8px;
 }
 
 .nav2 .categoriesDropDown ul {
@@ -149,6 +157,7 @@
     gap: 50px;
     align-items: center;
     border: 1px solid #eef2f6;
+    box-sizing: border-box;
     border-radius: 5px;
     min-height: 50px;
     background-color: white;
@@ -156,6 +165,11 @@
 
 .nav2 .mainNav li a:hover {
     color: var(--main);
+}
+
+.nav2 .categoriesLink:hover {
+    color: var(--main);
+    cursor: default;
 }
 
 .nav2 .categoriesLink:hover .categoriesDropDown {

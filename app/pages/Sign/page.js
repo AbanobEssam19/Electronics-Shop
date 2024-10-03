@@ -1,8 +1,5 @@
 'use client'
-import '../../globals.css';
 import styles from "./page.module.css"
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -352,7 +349,7 @@ export default function Page() {
                     </div>
 
                     <div className={`${styles.panel} ${styles.right__panel}`}>
-                        <div class={styles.content}>
+                        <div className={styles.content}>
                             <h3 className={styles.panel__title}>Already have account</h3>
                             <p className={styles.panel__text}>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ex fuga minima iure optio repudiandae ipsum?</p>
                             <button className={`${styles.formBtn} ${styles.transparent}`} id="signin__btn" onClick={changeToSignIn} >Sign in</button>

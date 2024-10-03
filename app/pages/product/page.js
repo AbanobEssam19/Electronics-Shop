@@ -1,6 +1,4 @@
 "use client";
-import "bootstrap/dist/css/bootstrap.min.css";
-import Nav from "@/app/components/Nav/nav";
 import Carousel from "../../components/Carousel/carousel";
 import styles from "./page.module.css";
 import Link from "next/link";
@@ -13,7 +11,6 @@ import { fab } from "@fortawesome/free-brands-svg-icons";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 import Card from "@/app/components/Card/card";
-import Footer from "@/app/components/Footer/footer";
 
 library.add(fab, fas, far);
 

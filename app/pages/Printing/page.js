@@ -1,9 +1,6 @@
 "use client";
 import styles from "./3d.module.css";
 import { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import Nav from "@/app/components/Nav/nav";
-import Footer from "@/app/components/Footer/footer";
 
 const Printing = () => {
   const [name, setName] = useState("");
@@ -35,7 +32,6 @@ const Printing = () => {
 
   return (
     <>
-      <Nav />
       <div className={styles.form_container}>
         <h1>3D Printing Service Reservation</h1>
         <form onSubmit={handleSubmit}>
@@ -102,7 +98,6 @@ const Printing = () => {
           <button type="submit">Send Order</button>
         </form>
       </div>
-      <Footer />
     </>
   );
 };

@@ -2,8 +2,15 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Nav from "./components/Nav/nav";
 import Footer from "./components/Footer/footer";
-import { UserProvider } from "./context/UserContext";
-import { ProductProvider } from "./context/ProductContext";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import { library } from "@fortawesome/fontawesome-svg-core";
+
+import { fab } from "@fortawesome/free-brands-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { far } from "@fortawesome/free-regular-svg-icons";
+
+library.add(fab, fas, far);
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,15 +30,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <UserProvider>
-          <ProductProvider>
-            <Nav />
-            {children}
-            <Footer />
-          </ProductProvider>
-        </UserProvider>
+    <html lang="en" suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true} className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Nav />
+        {children}
+        <Footer />
       </body>
     </html>
   );

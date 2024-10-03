@@ -17,6 +17,11 @@
     border: none;
 }
 
+.SideFilters:hover {
+    background-color: white !important;
+    color: black !important;
+}
+
 .SortIcon {
     border: none;
     outline: none;
@@ -51,8 +56,9 @@
 .ProductsList {
     border-left: 1px solid #e3e1e1 ;
     margin-left: 0px;
-    padding: 30px;
+    padding: 15px;
     display: flex;
+    gap: 10px;
     flex-wrap: wrap;
     justify-content: space-around;
 }
@@ -63,7 +69,7 @@
 
 @media (max-width: 1399px) {
     .LeftPart {
-        width: 700px;
+        width: 890px;
     }
 
     .FilterSlider {
@@ -75,7 +81,7 @@
 
 @media (max-width: 1199px) {
     .LeftPart {
-        width: 510px;
+        width: 715px;
     }
 
     .FilterSlider {
@@ -89,9 +95,9 @@
 
 @media (max-width: 991px) {
     .SideFilters {
-        display: inline;
+        display: inline !important;
     }
-    
+
     .ShowingResults {
         display: none;
     }
@@ -111,8 +117,8 @@
     .ProductsList{
         border: none;
         padding: 0px;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        width: 100%;
+        margin: 20px 0px;
     }
 
     .Pagination {
@@ -140,7 +146,7 @@
 @media (max-width: 531px) {
     .ProductsList{
         grid-template-columns: repeat(2, auto);
-        gap: 0px;
+        gap: 10px;
 
     }
 
@@ -166,5 +172,7 @@
     .ProductsList {
         grid-template-columns: repeat(1, auto);
         margin: auto;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 }

@@ -1,21 +1,11 @@
 'use client'
-import '../../globals.css';
 import styles from "./bar.module.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-import { library } from '@fortawesome/fontawesome-svg-core'
-
-import { fab } from '@fortawesome/free-brands-svg-icons'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
 
 import Link from "next/link";
 
 import { useEffect, useRef } from 'react';
-
-library.add(fab, fas, far);
 
 export default function ProgressBar(props) {
 

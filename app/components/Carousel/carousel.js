@@ -1,13 +1,6 @@
 "use client";
-import "bootstrap/dist/css/bootstrap.min.css";
 import styles from "./carousel.module.css";
-import { useEffect } from "react";
 function Carousel() {
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      import("bootstrap/dist/js/bootstrap.bundle.min.js");
-    }
-  }, []);
   return (
     <div
       id="mainCarousel"

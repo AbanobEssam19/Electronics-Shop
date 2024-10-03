@@ -1,7 +1,5 @@
 'use client'
-import './globals.css';
 import styles from "./page.module.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -10,37 +8,45 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
+library.add(fab, fas, far);
 
 import Link from "next/link";
 
-library.add(fab, fas, far);
-
-import Nav from "./components/Nav/nav";
-
-import Footer from "./components/Footer/footer";
 
 import Card from './components/Card/card';
 
 import { useEffect, useRef, useState } from "react";
 
-import { useUser } from './context/UserContext';
-import { useProduct } from './context/ProductContext';
+import Modal from "./components/Modal/modal";
 
 export default function Home() {
+
+  const [products, setProducts] = useState([]);
+
+  const [currentProduct, setCurrentProduct] = useState(null);
 
   useEffect(() => {
       if (typeof window !== 'undefined') {
         import('bootstrap/dist/js/bootstrap.bundle.min.js');
       }
+
+      async function fetchProducts() {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        setProducts(data.products);
+      }
+  
+      fetchProducts();
   }, []);
   
   return (
     <div className={styles.mainPage}>
       <div className={styles.mainContent}>
         <Carousel />
-        <SpecialOffers />
-        <NewProducts />
+        <SpecialOffers products={products} setCurrentProduct={setCurrentProduct} />
+        <NewProducts products={products} setCurrentProduct={setCurrentProduct} />
       </div>
+      <Modal currentProduct={currentProduct} />
     </div>
   );
 }
@@ -56,13 +62,13 @@ function Carousel() {
 
       <div className="carousel-inner">
         <div className="carousel-item active">
-          <img src="../mainCarousel.jpg" className="d-block w-100" />
+          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727851295/mainCarousel_eqbvvk.jpg" className="d-block w-100" />
         </div>
         <div className="carousel-item">
-          <img src="../shippingCarousel.jpg" className="d-block w-100" />
+          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727851295/shippingCarousel_z7gmek.jpg" className="d-block w-100" />
         </div>
         <div className="carousel-item">
-          <img src="../3dPrintingCarousel.jpg" className="d-block w-100" />
+          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727851294/3dPrintingCarousel_qcgzjq.jpg" className="d-block w-100" />
         </div>
       </div>
 
@@ -76,9 +82,7 @@ function Carousel() {
   );
 }
 
-function SpecialOffers() {
-
-  const products = useProduct();
+function SpecialOffers({products, setCurrentProduct}) {
   const [sorted, setSorted] = useState([]);
 
   useEffect(() => {
@@ -108,7 +112,7 @@ function SpecialOffers() {
         <div className={styles.cardContainer} ref={container} >
           {
             sorted.slice(0, Math.min(sorted.length, 10)).map((product) => (
-              <Card key={product.id} product={product} />
+              product.discount != 0 && <Card key={product.id} product={product} setCurrentProduct={setCurrentProduct} />
             ))
           }
         </div>
@@ -118,9 +122,8 @@ function SpecialOffers() {
   );
 }
 
-function NewProducts() {
+function NewProducts({products, setCurrentProduct}) {
 
-  const products = useProduct();
   const [sorted, setSorted] = useState([]);
 
   useEffect(() => {
@@ -149,7 +152,7 @@ function NewProducts() {
         <div className={styles.cardContainer} ref={container} >
           {
             sorted.slice(0, Math.min(sorted.length, 10)).map((product) => (
-              <Card key={product.id} product={product} />
+              <Card key={product.id} product={product} setCurrentProduct={setCurrentProduct} />
             ))
           }
         </div>

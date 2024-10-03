@@ -1,22 +1,11 @@
 "use client";
-import "../../globals.css";
 import styles from "./nav.module.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import { library } from "@fortawesome/fontawesome-svg-core";
-
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-import { useUser } from "@/app/context/UserContext";
-
-library.add(fab, fas, far);
 
 function CartItem() {
 
@@ -27,7 +16,7 @@ function CartItem() {
   return (
     <div className={styles.cartItemContainer} >
       <div className={styles.imgContainer} >
-        <img src="../card-1.jpg" />
+        <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" />
       </div>
       <div className={styles.itemInfo} >
         <div className={styles.itemInfoHead}>
@@ -50,11 +39,12 @@ function CartItem() {
   )
 }
 
-function Nav1() {
-
-  const user = useUser();
+function Nav1({user}) {
 
   const cartButton = useRef(null);
+  const checkoutButton = useRef(null);
+  const closeCartButton = useRef(null);
+  const veiwCartButton = useRef(null);
 
   function checkUser(e) {
     if (user == null) {
@@ -67,6 +57,7 @@ function Nav1() {
 
   function logout() {
     localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     window.location.href = "/";
   }
 
@@ -76,7 +67,7 @@ function Nav1() {
     <div className={`container ${styles.nav1}`}>
       <Link href="/" className={styles.navHeader}>
         <div className={styles.logoContainer}>
-          <img src="../logo.png" />
+          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727851294/logo_zdcp3q.png" />
         </div>
         <h1>AB Electronics</h1>
       </Link>
@@ -139,7 +130,7 @@ function Nav1() {
       >
         <div className={`offcanvas-header ${styles.cartHeader}`}>
           <p>CART ({user ? user.cart.length : 0})</p>
-          <button type="button" data-bs-dismiss="offcanvas" ref={closeButton}>
+          <button type="button" data-bs-dismiss="offcanvas" ref={closeCartButton}>
             <FontAwesomeIcon
               icon="fa-solid fa-xmark"
               style={{ width: "20px", height: "20px" }}
@@ -164,8 +155,8 @@ function Nav1() {
               <p>100.00 EGP</p>
             </div>
             <div className={styles.footerLinks}>
-              <Link href="../pages/cart">VIEW CART</Link>
-              <Link href="/">CHECKOUT</Link>
+              <Link href="../pages/cart" onClick={() => closeCartButton.current.click()} >VIEW CART</Link>
+              <Link href="../pages/checkout" onClick={() => closeCartButton.current.click()} >CHECKOUT</Link>
             </div>
           </div>
         </div>
@@ -177,8 +168,8 @@ function Nav1() {
   );
 }
 
-function Nav2() {
-  const user = useUser();
+function Nav2({user}) {
+  const closeMenuButton = useRef(null);
   return (
     <div className={`container-fluid ${styles.nav2}`}>
       <div className={`container ${styles.contentContainer}`}>
@@ -187,46 +178,31 @@ function Nav2() {
             <Link href="/">Home</Link>
           </li>
           <li className={styles.categoriesLink}>
-            <Link href="/">
+            <p>
               Categories <FontAwesomeIcon icon="fa-solid fa-caret-down" />
-            </Link>
+            </p>
             <div className={styles.categoriesDropDown}>
               <ul>
                 <li>
-                  <Link href="/">Home</Link>
+                  <Link href="/pages/products?category=all">All</Link>
                 </li>
                 <li>
-                  <Link href="/">Categories</Link>
+                  <Link href="/pages/products?category=motor">Motors</Link>
                 </li>
                 <li>
-                  <Link href="/">3D Printing</Link>
+                <Link href="/pages/products?category=led">LED</Link>
                 </li>
                 <li>
-                  <Link href="/">About Us</Link>
+                  <Link href="/pages/products?category=module">Modules</Link>
                 </li>
                 <li>
-                  <Link href="/">Home</Link>
-                </li>
-                <li>
-                  <Link href="../pages/categories">Categories</Link>
-                </li>
-                <li>
-                  <Link href="/">3D Printing</Link>
-                </li>
-                <li>
-                  <Link href="/">About Us</Link>
-                </li>
-                <li>
-                  <Link href="#">Home</Link>
-                </li>
-                <li>
-                  <Link href="/">Categories</Link>
+                  <Link href="/pages/products?category=sensor">Sensors</Link>
                 </li>
               </ul>
             </div>
           </li>
           <li>
-            <Link href="../pages/Printing">3D Printing</Link>
+            <Link href="../pages/printing">3D Printing</Link>
           </li>
           <li>
             <Link href="../pages/contact">Contact Us</Link>
@@ -277,9 +253,9 @@ function Nav2() {
       >
         <div className={`offcanvas-header ${styles.sideBarHeader}`}>
           <div className={styles.sideBarLogo}>
-            <img src="../side-bar-logo.png" />
+            <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727851295/side-bar-logo_jgrp2c.png" />
           </div>
-          <button type="button" data-bs-dismiss="offcanvas">
+          <button type="button" data-bs-dismiss="offcanvas" ref={closeMenuButton} >
             <FontAwesomeIcon
               icon="fa-solid fa-xmark"
               style={{ width: "20px", height: "20px" }}
@@ -288,7 +264,7 @@ function Nav2() {
         </div>
         <div className={`offcanvas-body ${styles.sideBarBody}`}>
           <li className={styles.sideNavItem}>
-            <Link href="/">
+            <Link href="/" onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-solid fa-house" /> Home
             </Link>
           </li>
@@ -306,35 +282,38 @@ function Nav2() {
             className={`collapse ${styles.categoriesSideNav}`}
           >
             <li className={styles.sideNavItem}>
-              <Link href="#">Home</Link>
+              <Link href="/pages/products?category=all" onClick={() => closeMenuButton.current.click()}>All</Link>
             </li>
             <li className={styles.sideNavItem}>
-              <Link href="/pages/categories">Categories</Link>
+              <Link href="/pages/products?category=motor" onClick={() => closeMenuButton.current.click()}>Motors</Link>
             </li>
             <li className={styles.sideNavItem}>
-              <Link href="/">3D Printing</Link>
+              <Link href="/pages/products?category=led" onClick={() => closeMenuButton.current.click()}>LED</Link>
             </li>
             <li className={styles.sideNavItem}>
-              <Link href="/">About Us</Link>
+              <Link href="/pages/products?category=module" onClick={() => closeMenuButton.current.click()}>Modules</Link>
+            </li>
+            <li className={styles.sideNavItem}>
+              <Link href="/pages/products?category=sensor" onClick={() => closeMenuButton.current.click()}>Sensors</Link>
             </li>
           </div>
           <li className={styles.sideNavItem}>
-            <Link href="/pages/Printing">
+            <Link href="/pages/printing" onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-brands fa-unity" /> 3D Printing
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/pages/contact">
+            <Link href="/pages/contact" onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-solid fa-address-card" /> Contact Us
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/pages/wishlist">
+            <Link href="/pages/wishlist" onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-solid fa-heart" /> Wishlist
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/pages/sign">
+            <Link href="/pages/sign" onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-solid fa-user" /> {user != null ? "My account" : "Sign in"}
             </Link>
           </li>
@@ -345,10 +324,32 @@ function Nav2() {
 }
 
 export default function Nav() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      let token = localStorage.getItem('token');
+
+      if (!token) {
+          token = sessionStorage.getItem('token');
+      }
+
+      const res = await fetch("/api/user", {
+          headers: {
+              'Authorization': `${token}`
+          }
+      });
+
+      const data = await res.json();
+      setUser(data.user);
+    };
+    fetchUser();
+  }, []);
+
   return (
     <div className={styles.main}>
-      <Nav1 />
-      <Nav2 />
+      <Nav1 user={user}/>
+      <Nav2 user={user}/>
     </div>
   );
 }

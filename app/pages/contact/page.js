@@ -1,7 +1,5 @@
 "use client";
-import "../../globals.css";
 import styles from "./page.module.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -12,9 +10,6 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { far } from "@fortawesome/free-regular-svg-icons";
 
 import Link from "next/link";
-
-import Nav from "@/app/components/Nav/nav";
-import Footer from "@/app/components/Footer/footer";
 
 import { useEffect } from "react";
 
@@ -57,7 +52,7 @@ export default function Contact() {
                                                 <textarea name="message" placeholder="Massage"></textarea>
                                             </div>
                                             <div className={styles["form-group"]}>
-                                                <button type="submit" class={`${styles["theme-btn"]} ${styles["btn-style-one"]}`}>Send Now</button>
+                                                <button type="submit" className={`${styles["theme-btn"]} ${styles["btn-style-one"]}`}>Send Now</button>
                                             </div>
                                         </div>
                                     </form>
