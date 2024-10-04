@@ -1,42 +1,99 @@
-.App {
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .form_container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .form_container form div {
-    margin-bottom: 15px;
-  }
-  
-  .form_container label{
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  .form_container input {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-  }
-  
-  .form_container button {
-    padding: 10px 20px;
-    background-color: #FCE0A8;
-    color: black;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .form_container button:hover {
-    background-color: #886520;
-  }
-  
+
+.body {
+  background-color: #e9ecef; /* Light gray background for contrast */
+  margin: 0; /* Remove default margin */
+  font-family: Arial, sans-serif; /* Use a clean, readable font */
+}
+
+/* General container for the form */
+.form_container {
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  margin: 0; /* Remove margins */
+  padding: 20px; /* Padding for the content */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  background-color: #f9f9f9; /* Light background for the form */
+}
+
+/* Headings */
+.form_container h1 {
+  text-align: center; /* Center the title */
+  color: #333; /* Dark text color */
+  margin-bottom: 20px; /* Space below the title */
+}
+
+/* Options panel styling */
+.options-panel {
+  margin-bottom: 20px; /* Space below options panel */
+  padding: 20px; /* Inner padding */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 8px; /* Rounded corners */
+  background-color: #fff; /* White background */
+}
+
+/* Button styles */
+.button {
+  padding: 10px 15px; /* Padding for buttons */
+  margin: 5px; /* Space between buttons */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.selected {
+  background-color: #0056b3; /* Selected button color */
+}
+
+/* Input styles */
+.inputfield {
+  width: 100%; /* Full width */
+  padding: 10px; /* Padding inside inputs */
+  margin-bottom: 10px; /* Space below inputs */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow */
+  transition: border-color 0.3s; /* Smooth border color transition */
+}
+
+.inputfield:focus {
+  border-color: #007bff; /* Blue border on focus */
+}
+
+/* Checkbox styling */
+.label {
+  font-size: 16px; /* Font size for labels */
+  margin-right: 10px; /* Space to the right */
+}
+
+/* Price styling */
+.price {
+  font-weight: bold; /* Bold text */
+  font-size: 18px; /* Larger font size */
+  color: #333; /* Dark text color */
+  margin: 10px 0; /* Space above and below */
+}
+
+/* Form submission button */
+.submitbutton {
+  background-color: #ce9b1b; /* Green background */
+  padding: 15px; /* Padding for the button */
+  font-size: 18px; /* Larger font size */
+  transition: background-color 0.3s; /* Smooth transition */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Rounded corners */
+  color: white; /* White text */
+  width: 100%; /* Full width */
+}
+
+.submitbutton:hover {
+  background-color: #c88b06; /* Darker green on hover */
+}
