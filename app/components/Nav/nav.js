@@ -61,7 +61,7 @@ function Nav1({user}) {
     window.location.href = "/";
   }
 
-  const closeButton = useRef(null);
+  const searchBtn = useRef(null);
 
   const [searchValue, setSearchValue] = useState("");
 
@@ -80,8 +80,9 @@ function Nav1({user}) {
           className={styles.searchBar}
           placeholder="Search for products..."
           onChange={(e) => setSearchValue(e.target.value)}
+          onKeyDown={(e) => e.key == "Enter" && searchBtn.current.click()}
         />
-        <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`}>
+        <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`} ref={searchBtn}>
           <FontAwesomeIcon
             icon="fa-solid fa-magnifying-glass"
           />
@@ -174,6 +175,7 @@ function Nav2({user}) {
   const closeMenuButton = useRef(null);
 
   const [searchValue, setSearchValue] = useState("");
+  const searchBtn = useRef(null);
 
   return (
     <div className={`container-fluid ${styles.nav2}`}>
@@ -236,8 +238,9 @@ function Nav2({user}) {
             className={styles.searchBar}
             placeholder="Search for products..."
             onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={(e) => e.key == "Enter" && searchBtn.current.click()}
           />
-          <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`}>
+          <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`} ref={searchBtn}>
             <FontAwesomeIcon
               icon="fa-solid fa-magnifying-glass"
             />

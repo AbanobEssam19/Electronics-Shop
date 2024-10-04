@@ -36,7 +36,7 @@ export default function Products() {
 
   const [startInd, setStartInd] = useState(0);
   
-  const arrSize = 2;
+  const arrSize = 12;
 
   const [paginationLinks, setPaginationLinks] = useState([]);
 
@@ -77,14 +77,14 @@ export default function Products() {
         mx = Math.max(mx, products[i].price);
         temp.push(products[i]);
       }
-      else if (search && products[i].name.toLowerCase().includes(search.toLowerCase())) {
+      else if (search != null && products[i].name.toLowerCase().includes(search.toLowerCase())) {
         mx = Math.max(mx, products[i].price);
         temp.push(products[i]);
       }
       else {
         console.log(products[i].categories);
         for (let j = 0; j < products[i].categories.length; j++) {
-          if (products[i].categories[j].toLowerCase() == category) {
+          if (products[i].categories[j].toLowerCase() == category || (search != null && products[i].categories[j].toLowerCase().includes(search.toLowerCase()))) {
             mx = Math.max(mx, products[i].price);
             temp.push(products[i]);
             break;
@@ -96,7 +96,7 @@ export default function Products() {
     temp.sort((a, b) => new Date(b.date) - new Date(a.date));
     setSorted(temp);
     setCurrent(temp);
-  }, [products, category]);
+  }, [products, category, search]);
 
   useEffect(() => {
     if (sortBy == "latest") {
@@ -183,7 +183,7 @@ export default function Products() {
     <>
       <div className={`container`}>
         <div className={`${styles.FirstRow}`}>
-          <p className={styles.title}>{title}</p>
+          <p className={styles.title} style={{fontWeight: "bold", margin: "0px"}}>{title}</p>
           <div className={styles.filterButtons}>
             <div className={`${styles.LeftPart}`}>
               {/* <!-- Offcanvas Sidebar --> */}

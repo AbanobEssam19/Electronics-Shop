@@ -86,12 +86,12 @@ export default function Modal(product) {
               <h1 className={styles.ProductText}>
                 {name}
               </h1>
-              <div className={styles.state}>
+              <div className={styles.state} style={quantity > 0 ? {} : { backgroundColor: "#ff00000a" }}>
                 <FontAwesomeIcon
-                  icon="fa-regular fa-circle-check"
-                  style={{ color: "#54ca87" }}
+                  icon={`fa-regular fa-circle-${quantity > 0 ? "check" : "xmark"}`}
+                  style={quantity > 0 ? { color: "#54ca87" } : {color: "red"}}
                 />
-                <p>In Stock</p>
+                <p style={quantity > 0 ? {} : { color: "red" }}>{quantity > 0 ? "In" : "Out of"} Stock</p>
               </div>
               <div className={styles.price}>
                 <p>{price}.00 EGP</p>
@@ -103,7 +103,7 @@ export default function Modal(product) {
                   <input type="number" value={1} ref={amountRef} />
                   <button onClick={increaseAmount}>+</button>
                 </div>
-                <button>Add to cart</button>
+                <button disabled={quantity == 0} >Add to cart</button>
                 <button>
                   <FontAwesomeIcon icon="fa-regular fa-heart" />
                   <p>Add to wishlist</p>

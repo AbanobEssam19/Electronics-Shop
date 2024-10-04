@@ -1,17 +1,11 @@
 import styles from "./page.module.css";
-import Nav from "@/app/components/Nav/nav";
-import Footer from "@/app/components/Footer/footer";
 
 export default function Checkout() {
   return (
-    <>
-      <Nav />
-      <div className={`container ${styles.main}`}>
-        <BillingAndShipping />
-        <Order />
-      </div>
-      <Footer />
-    </>
+    <div className={`container ${styles.main}`}>
+      <BillingAndShipping />
+      <Order />
+    </div>
   );
 }
 function BillingAndShipping() {
