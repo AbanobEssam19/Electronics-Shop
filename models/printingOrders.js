@@ -1,13 +1,12 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const Orders = mongoose.model('Orders', 
-    {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' },
-        date: Date,
-        total: Number,
-        address: String,
-        phone: Number
-    }
-)
+const Orders = mongoose.model("Orders", {
+  name: String,
+  phone: String,
+  grams: Number,
+  color: String,
+  quality: String,
+  filePath: String,
+});
 
-module.exports = Orders
+module.exports = Orders;
