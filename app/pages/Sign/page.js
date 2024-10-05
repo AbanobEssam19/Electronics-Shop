@@ -341,7 +341,7 @@ export default function Page() {
                     <div className={`${styles.panel} ${styles.left__panel}`}>
                         <div className={styles.content}>
                             <h3 className={styles.panel__title}>New here ?</h3>
-                            <p className={styles.panel__text}>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ex fuga minima iure optio repudiandae ipsum?</p>
+                            <p className={styles.panel__text}></p>
                             <button className={`${styles.formBtn} ${styles.transparent}`} id="register__btn" onClick={changeToRegister} ref={registerBtn} >Register</button>
                         </div>
 
@@ -351,11 +351,11 @@ export default function Page() {
                     <div className={`${styles.panel} ${styles.right__panel}`}>
                         <div className={styles.content}>
                             <h3 className={styles.panel__title}>Already have account</h3>
-                            <p className={styles.panel__text}>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ex fuga minima iure optio repudiandae ipsum?</p>
+                            <p className={styles.panel__text}></p>
                             <button className={`${styles.formBtn} ${styles.transparent}`} id="signin__btn" onClick={changeToSignIn} >Sign in</button>
                         </div>
 
-                        <img src="../img.png" alt="" className={styles.panel__img} />
+                        <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1728144483/img_hwhcer.png" alt="" className={styles.panel__img} />
                     </div>
                 </div>
             </div>

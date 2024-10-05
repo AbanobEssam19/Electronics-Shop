@@ -28,13 +28,13 @@ function Carousel() {
 
       <div className={`carousel-inner ${styles.carouselInner}`}>
         <div className={`carousel-item active ${styles.carouselItem}`}>
-          <img src="../product1.jpg" className="d-block w-100" />
+          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" className="d-block w-100" />
         </div>
         <div className={`carousel-item ${styles.carouselItem}`}>
-          <img src="../product1.jpg" className="d-block w-100" />
+          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" className="d-block w-100" />
         </div>
         <div className={`carousel-item ${styles.carouselItem}`}>
-          <img src="../product1.jpg" className="d-block w-100" />
+          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" className="d-block w-100" />
         </div>
       </div>
 

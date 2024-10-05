@@ -23,7 +23,7 @@ function WishlistItem() {
                 <div className={styles.center}>
                     <img
                         className={styles.product_image}
-                        src="../product1.jpg"
+                        src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg"
                     />
                 </div>
             </td>

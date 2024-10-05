@@ -30,10 +30,10 @@ export default function Home() {
         import('bootstrap/dist/js/bootstrap.bundle.min.js');
       }
 
-      async function fetchProducts() {
-        const res = await fetch("/api/products");
-        const data = await res.json();
-        setProducts(data.products);
+      function fetchProducts() {
+        fetch("/api/products")
+        .then((res) => res.json())
+        .then((data) => setProducts(data.products));
       }
   
       fetchProducts();
@@ -83,11 +83,11 @@ function Carousel() {
 }
 
 function SpecialOffers({products, setCurrentProduct}) {
-  const [sorted, setSorted] = useState([]);
+  const [arr, setArr] = useState([]);
 
   useEffect(() => {
-    const discountSorted = [...products].sort((a, b) => b.discount - a.discount);
-    setSorted(discountSorted);
+    const filtered = [...products].filter((product) => product.discount > 0);
+    setArr(filtered);
   }, [products]);
 
   
@@ -105,14 +105,14 @@ function SpecialOffers({products, setCurrentProduct}) {
     <div className={`${styles.section}`}>
       <div className={styles.header}>
         <h4>Special Offers <FontAwesomeIcon icon="fa-solid fa-fire" style={{color: "#F8C051"}} /></h4>
-        <Link href="/">View All →</Link>
+        <Link href="/pages/products?category=all&sale=1">View All →</Link>
       </div>
       <div className={styles.content} >
         <button onClick={slideLeft}>&lt;</button>
         <div className={styles.cardContainer} ref={container} >
           {
-            sorted.slice(0, Math.min(sorted.length, 10)).map((product) => (
-              product.discount != 0 && <Card key={product.id} product={product} setCurrentProduct={setCurrentProduct} />
+            arr.slice(0, Math.min(arr.length, 10)).map((product) => (
+              <Card product={product} setCurrentProduct={setCurrentProduct} />
             ))
           }
         </div>
@@ -124,11 +124,11 @@ function SpecialOffers({products, setCurrentProduct}) {
 
 function NewProducts({products, setCurrentProduct}) {
 
-  const [sorted, setSorted] = useState([]);
+  const [arr, setArr] = useState([]);
 
   useEffect(() => {
-    const dateSorted = [...products].sort((a, b) => new Date(b.date) - new Date(a.date));
-    setSorted(dateSorted);
+    const sorted = [...products].sort((a, b) => new Date(b.date) - new Date(a.date));
+    setArr(sorted);
   }, [products]);
 
   const container = useRef();
@@ -145,14 +145,14 @@ function NewProducts({products, setCurrentProduct}) {
     <div className={`${styles.section}`}>
       <div className={styles.header}>
         <h4>New Products</h4>
-        <Link href="/">View All →</Link>
+        <Link href="/pages/products?category=all">View All →</Link>
       </div>
       <div className={styles.content} >
         <button onClick={slideLeft}>&lt;</button>
         <div className={styles.cardContainer} ref={container} >
           {
-            sorted.slice(0, Math.min(sorted.length, 10)).map((product) => (
-              <Card key={product.id} product={product} setCurrentProduct={setCurrentProduct} />
+            arr.slice(0, Math.min(arr.length, 10)).map((product) => (
+              <Card product={product} setCurrentProduct={setCurrentProduct} />
             ))
           }
         </div>

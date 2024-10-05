@@ -36,7 +36,7 @@ export default function Products() {
 
   const [startInd, setStartInd] = useState(0);
   
-  const arrSize = 12;
+  const arrSize = 6;
 
   const [paginationLinks, setPaginationLinks] = useState([]);
 
@@ -48,6 +48,7 @@ export default function Products() {
 
   const search = searchParams.get('search');
 
+  const sale = searchParams.get('sale');
   
 
   function reset() {
@@ -68,7 +69,13 @@ export default function Products() {
     else {
       setTitle(`Products for category: ${category.toUpperCase()}`);
     }
+
     reset();
+
+    if (sale == 1) {
+      setOnSale(true);
+      document.getElementById("sale").checked = true;
+    }
 
     let temp = [];
     let mx = 0;
@@ -82,7 +89,6 @@ export default function Products() {
         temp.push(products[i]);
       }
       else {
-        console.log(products[i].categories);
         for (let j = 0; j < products[i].categories.length; j++) {
           if (products[i].categories[j].toLowerCase() == category || (search != null && products[i].categories[j].toLowerCase().includes(search.toLowerCase()))) {
             mx = Math.max(mx, products[i].price);
@@ -96,7 +102,19 @@ export default function Products() {
     temp.sort((a, b) => new Date(b.date) - new Date(a.date));
     setSorted(temp);
     setCurrent(temp);
-  }, [products, category, search]);
+  }, [products, category, search, sale]);
+  
+  useEffect(() => {
+    const temp = [];
+    for (let i = 0; i < sorted.length; i++) {
+      if (sorted[i].price >= minPrice && checkSale(sorted[i]) && checkStock(sorted[i])) {
+        temp.push(sorted[i]);
+      }
+    }
+
+    setCurrent([...temp]);
+    setStartInd(0);
+  }, [minPrice, onSale, onStock, sortBy, sorted]);
 
   useEffect(() => {
     if (sortBy == "latest") {
@@ -120,10 +138,10 @@ export default function Products() {
       import("bootstrap/dist/js/bootstrap.bundle.min.js");
     }
     
-    async function fetchProducts() {
-      const res = await fetch("/api/products");
-      const data = await res.json();
-      setProducts(data.products);
+    function fetchProducts() {
+      fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products));
     }
 
     fetchProducts();
@@ -165,19 +183,6 @@ export default function Products() {
 
     setPaginationLinks(temp);
   }, [current, startInd]);
-
-
-  useEffect(() => {
-    const temp = [];
-    for (let i = 0; i < sorted.length; i++) {
-      if (sorted[i].price >= minPrice && checkSale(sorted[i]) && checkStock(sorted[i])) {
-        temp.push(sorted[i]);
-      }
-    }
-
-    setCurrent([...temp]);
-    setStartInd(0);
-  }, [minPrice, onSale, onStock, sortBy, sorted]);
 
   return (
     <>
@@ -351,9 +356,7 @@ export default function Products() {
                 <button className="page-link" onClick={() => setStartInd(Math.max(startInd - 1, 0))}>Previous</button>
               </li>
               {
-                paginationLinks.map((item) => {
-                  return item;
-                })
+                paginationLinks
               }
             </ul>
           </nav>
