@@ -61,12 +61,6 @@ function Nav1({user}) {
     }
   }
 
-  function logout() {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
-    window.location.href = "/";
-  }
-
   const searchBtn = useRef(null);
 
   const [searchValue, setSearchValue] = useState("");
@@ -95,7 +89,7 @@ function Nav1({user}) {
         </Link>
       </div>
 
-      <Link href="../pages/sign" className={styles.navBtns}>
+      <Link href={user ? "../pages/myaccount" : "../pages/sign"} className={styles.navBtns}>
         <FontAwesomeIcon
           icon="fa-regular fa-user"
           style={{ width: "30px", height: "25px" }}
@@ -170,9 +164,6 @@ function Nav1({user}) {
           </div>
         </div>
       </div>
-      <button onClick={logout} style={user ? {} : {display: "none"}}>
-        Logout
-      </button>
     </div>
   );
 }
@@ -333,7 +324,7 @@ function Nav2({user}) {
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/pages/sign" onClick={() => closeMenuButton.current.click()}>
+            <Link href={user ? "../pages/myaccount" : "../pages/sign"} onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-solid fa-user" /> {user != null ? "My account" : "Sign in"}
             </Link>
           </li>
