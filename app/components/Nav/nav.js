@@ -356,7 +356,7 @@ export default function Nav() {
 
       const res = await fetch("/api/user", {
           headers: {
-              'Authorization': `${token}`
+              'token': `${token}`
           }
       });
 

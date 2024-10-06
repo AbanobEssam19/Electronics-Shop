@@ -26,7 +26,7 @@ function CartItem() {
     return (
         <tr className={styles.item} >
             <td>
-                <img src='../product1.jpg' />
+                <img src='https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg' />
                 <p>AC Light Dimmer SCR (220V-2000W) and AC Motor</p>
             </td>
             <td className={styles.price} >100.00 EGP</td>

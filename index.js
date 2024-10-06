@@ -1,5 +1,14 @@
 const express = require('express');
 const next = require('next');
+const app = next({dev: true});
+const handle = app.getRequestHandler();
+
+const server = express();
+
+server.use(express.json());
+
+const users = require('./models/users');
+const products = require('./models/products');
 
 const bcrypt = require('bcrypt');
 
@@ -26,31 +35,19 @@ const storage = multer.diskStorage({
 
 const multerMiddelware = multer({storage: storage});
 
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
-const handle = app.getRequestHandler();
-
-const users = require('./models/users');
-const products = require('./models/products');
-
-const server = express();
-
-server.use(express.json());
-
 require("./mongodb");
 
 const authenticateToken = (req, res, next) => {
-    const token = req.headers['authorization'];
+    const token = req.headers['token'];
 
     if (!token) {
-        return res.status(401).json({success: false});
+        return res.json({success: false});
     }
 
     jwt.verify(token,process.env.JWT_SECRET, (err, user) => {
         if (err) {
-            return res.status(403).json({success: false});
+            return res.json({success: false});
         }
-
         req.user = user;
         next();
     })
@@ -59,12 +56,10 @@ const authenticateToken = (req, res, next) => {
 app.prepare().then(() => {
 
     server.post("/register", async (req, res) => {
-
         let exist = await users.findOne({username: req.body.username});
 
-        
         if (exist) {
-            res.status(404).json({success: false});
+            res.json({success: false});
             return;
         }
 
@@ -86,7 +81,7 @@ app.prepare().then(() => {
             process.env.JWT_SECRET,
             {expiresIn: '14d'}
         )
-        res.status(200).json({success: true, token});
+        res.json({success: true, token});
 
     });
 
@@ -94,7 +89,7 @@ app.prepare().then(() => {
         let targetUser = await users.findOne({username: req.body.username});
 
         if (!targetUser) {
-            res.status(404).json({success: false});
+            res.json({success: false});
             return;
         }
 
@@ -106,10 +101,10 @@ app.prepare().then(() => {
                 process.env.JWT_SECRET,
                 {expiresIn: '14d'}
             );
-            res.status(200).json({success: true, token});
+            res.json({success: true, token});
         }
         else {
-            res.status(404).json({success: false});
+            res.json({success: false});
         }
 
     });
@@ -118,12 +113,12 @@ app.prepare().then(() => {
 
         const {name, categories, price, discount, quantity, description, specifications} = req.body;
 
-        const uploadPromises = req.files.map(async (file) => {
+        const uploadPhotos = req.files.map(async (file) => {
             const photo = await cloudinary.uploader.upload(file.path, {folder: 'products'});
             return cloudinary.url(photo.public_id);
         });
 
-        const photos = await Promise.all(uploadPromises);
+        const photos = await Promise.all(uploadPhotos);
 
         const date = new Date();
 
@@ -146,22 +141,20 @@ app.prepare().then(() => {
 
     server.get("/api/products", async (req, res) => {
         const product = await products.find();
-        return res.status(200).json({ products: product });
+        return res.json({ products: product });
     });
 
     server.get("/api/user", authenticateToken, async (req, res) => {
         let user = await users.findById(req.user.id);
-        return res.status(200).json({ user: user });
+        return res.json({ user: user });
     });
 
 
-    // For all other routes, use Next.js' default handler
     server.get('*', (req, res) => {
         return handle(req, res);
     });
 
-    server.listen(3000, (err) => {
-        if (err) throw err;
-        console.log('> Ready on http://localhost:3000');
+    server.listen(3000, () => {
+        console.log('port running http://localhost:3000');
     });
 });

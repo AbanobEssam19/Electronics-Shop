@@ -1,10 +1,14 @@
+import ProgressBar from "@/app/components/ProgressBar/bar";
 import styles from "./page.module.css";
 
 export default function Checkout() {
   return (
+    <div className="container">
+    <ProgressBar step={2} />
     <div className={`container ${styles.main}`}>
       <BillingAndShipping />
       <Order />
+    </div>
     </div>
   );
 }

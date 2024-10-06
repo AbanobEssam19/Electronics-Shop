@@ -30,8 +30,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body suppressHydrationWarning={true} className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Nav />
         {children}
         <Footer />
