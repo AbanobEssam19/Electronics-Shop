@@ -54,7 +54,6 @@ const Printing = () => {
       quantity,
     });
 
-    // Reset all states after submission
     setName("");
     setPhone("");
     setGrams("");
