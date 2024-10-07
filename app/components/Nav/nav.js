@@ -1,6 +1,12 @@
 "use client";
 import styles from "./nav.module.css";
+import { library } from "@fortawesome/fontawesome-svg-core";
 
+import { fab } from "@fortawesome/free-brands-svg-icons";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { far } from "@fortawesome/free-regular-svg-icons";
+
+library.add(fab, fas, far);
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Link from "next/link";
@@ -55,12 +61,6 @@ function Nav1({user}) {
     }
   }
 
-  function logout() {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
-    window.location.href = "/";
-  }
-
   const searchBtn = useRef(null);
 
   const [searchValue, setSearchValue] = useState("");
@@ -89,7 +89,7 @@ function Nav1({user}) {
         </Link>
       </div>
 
-      <Link href="../pages/sign" className={styles.navBtns}>
+      <Link href={user ? "../pages/myaccount" : "../pages/sign"} className={styles.navBtns}>
         <FontAwesomeIcon
           icon="fa-regular fa-user"
           style={{ width: "30px", height: "25px" }}
@@ -164,9 +164,6 @@ function Nav1({user}) {
           </div>
         </div>
       </div>
-      <button onClick={logout} style={user ? {} : {display: "none"}}>
-        Logout
-      </button>
     </div>
   );
 }
@@ -327,7 +324,7 @@ function Nav2({user}) {
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href="/pages/sign" onClick={() => closeMenuButton.current.click()}>
+            <Link href={user ? "../pages/myaccount" : "../pages/sign"} onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-solid fa-user" /> {user != null ? "My account" : "Sign in"}
             </Link>
           </li>
