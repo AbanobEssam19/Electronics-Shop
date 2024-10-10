@@ -3,26 +3,9 @@ import styles from "./page.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-
 import Link from "next/link";
 
-import { useEffect } from "react";
-
-library.add(fab, fas, far);
-
 export default function Contact() {
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            import('bootstrap/dist/js/bootstrap.bundle.min.js');
-        }
-    }, []);
-
     return (
         <>
             <section className={styles["contact-page-section"]}>

@@ -1,32 +1,86 @@
 "use client";
 import styles from "./nav.module.css";
-import { library } from "@fortawesome/fontawesome-svg-core";
-
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-
-library.add(fab, fas, far);
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUser, fetchProducts, fetchCarts } from "@/app/states/APIs/apis";
+import { udpateUser } from "@/app/states/reducers/userSlice";
+import { udpateCarts } from "@/app/states/reducers/cartsSlice";
 
-
-function CartItem() {
-
-  function removeCartItem(e) {
-    e.target.closest(`.${styles.cartItemContainer}`).remove();
+function CartItem({product, cart}) {
+  const dispatch = useDispatch();
+ 
+  if (!product) {
+    return <div>Loading...</div>;
   }
+
+  const user = useSelector((state) => state.userData.data);
+  const products = useSelector((state) => state.productsData.data);
+  const carts = useSelector((state) => state.cartsData.data);
+
+  async function removeCartItem() {
+    let token = localStorage.getItem('token');
+
+    if (!token)
+      token = sessionStorage.getItem('token');
+
+    const res = await fetch(`/api/cartitem/${cart._id}`, {
+      method: "DELETE",
+      headers: {
+         'token': `${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      dispatch(udpateUser(data.user));
+    }
+  };
+
+  const [itemQuantity, setItemQuantity] = useState(cart.quantity);
+
+  useEffect(() => {
+    setItemQuantity(cart.quantity);
+  }, [cart])
+
+  async function setQuantity(num) {
+    const quantity = parseInt(itemQuantity) + parseInt(num);
+    
+    if (quantity <= 0) {
+        removeCartItem();
+        return;
+    }
+
+    let token = localStorage.getItem('token');
+
+    if (!token)
+      token = sessionStorage.getItem('token');
+
+    const res = await fetch(`/api/cartitem/${cart._id}/${quantity}`, {
+        method: "PUT",
+        headers: {
+          'token': `${token}`
+        }
+    });
+
+    const data = await res.json();
+    if (data.success) {
+        dispatch(udpateCarts(data.carts));
+        dispatch(udpateUser(data.user));
+        setItemQuantity(quantity);
+    }
+  };
 
   return (
     <div className={styles.cartItemContainer} >
       <div className={styles.imgContainer} >
-        <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" />
+        <img src={product.photo[0]} />
       </div>
       <div className={styles.itemInfo} >
         <div className={styles.itemInfoHead}>
-          <p className={styles.title} >AC Light Dimmer SCR (220V-2000W) and AC Motor</p>
+          <p className={styles.title} >{product.name}</p>
           <button onClick={removeCartItem}>
             <FontAwesomeIcon
               icon="fa-solid fa-xmark" />
@@ -34,25 +88,51 @@ function CartItem() {
         </div>
         <div className={styles.quantity} >
           <div className={styles.quantityButtons} >
-            <button>-</button>
-            1
-            <button>+</button>
+            <button onClick={() => setQuantity(-1)}>-</button>
+            {itemQuantity}
+            <button onClick={() => setQuantity(1)}>+</button>
           </div>
-          <p className={styles.price} >100.00 EGP</p>
+          <p className={styles.price} >{product.price * itemQuantity}.00 EGP</p>
         </div>
       </div>
     </div>
   )
 }
 
-function Nav1({user}) {
+function Nav1() {
+  const dispatch = useDispatch();
+  
+  const products = useSelector((state) => state.productsData.data);
+  const user = useSelector((state) => state.userData.data);
+  const carts = useSelector((state) => state.cartsData.data);
+
+  useEffect(() => {
+    let token = localStorage.getItem('token');
+    if (!token)
+      token = sessionStorage.getItem('token');
+    dispatch(fetchUser(token));
+    dispatch(fetchProducts());
+    dispatch(fetchCarts());
+  }, []);
+
+  const [total, setTotal] = useState(0);
+  
+  useEffect(() => {
+    let newTotal = 0;
+    user && carts && products && user.cart.map((id) => {
+      const details = carts.find((cart) => cart._id == id);
+      if (details) {
+        const product = products.find((product) => product._id == details.product);
+        newTotal += product.price * details.quantity;
+      }
+    });
+    setTotal(newTotal);
+  }, [user])
 
   const cartButton = useRef(null);
-  const checkoutButton = useRef(null);
   const closeCartButton = useRef(null);
-  const veiwCartButton = useRef(null);
 
-  function checkUser(e) {
+  function checkUser() {
     if (user == null) {
       
     }
@@ -95,8 +175,8 @@ function Nav1({user}) {
           style={{ width: "30px", height: "25px" }}
         />
         <div style={{display: "flex", flexDirection: "column"}}>
-          {user != null ? <p style={{color: "gray", fontSize: "small"}}>Welcome</p> : ""}
-          <p style={{fontWeight: "bold"}}>{user != null ? user.username : "Sign in"}</p>
+          {user ? <p style={{color: "gray", fontSize: "small"}}>Welcome</p> : ""}
+          <p style={{fontWeight: "bold"}}>{user ? user.username : "Sign in"}</p>
         </div>
       </Link>
 
@@ -106,7 +186,7 @@ function Nav1({user}) {
         title="Wishlist"
       >
         <div className={styles.counter}>
-          <p>{user != null ? user.wishlist.length : 0}</p>
+          <p>{user ? user.wishlist.length : 0}</p>
         </div>
         <FontAwesomeIcon
           icon="fa-regular fa-heart"
@@ -116,7 +196,7 @@ function Nav1({user}) {
 
       <button className={styles.navBtns} onClick={checkUser}>
         <div className={styles.counter}>
-          <p>{user != null ? user.cart.length : 0}</p>
+          <p>{user ? user.cart.length : 0}</p>
         </div>
         <FontAwesomeIcon
           icon="fa-solid fa-cart-shopping"
@@ -142,20 +222,20 @@ function Nav1({user}) {
         </div>
         <div className={`offcanvas-body ${styles.cartBody}`}>
           <div className={styles.itemContainer}>
-            <CartItem />
-            <CartItem />
-            <CartItem />
-            <CartItem />
-            <CartItem />
-            <CartItem />
-            <CartItem />
-            <CartItem />
-            <CartItem />
+            {
+              user && carts && products && user.cart.map((id) => {
+                  const details = carts.find((cart) => cart._id == id);
+                  if (details) {
+                    const product = products.find((product) => product._id == details.product);
+                    return <CartItem product={product} cart={details} />
+                  }
+              })
+            }
           </div>
           <div className={styles.cartFooter}>
             <div className={styles.total}>
               <p>TOTAL:</p>
-              <p>100.00 EGP</p>
+              <p>{total}.00 EGP</p>
             </div>
             <div className={styles.footerLinks}>
               <Link href="../pages/cart" onClick={() => closeCartButton.current.click()} >VIEW CART</Link>
@@ -168,7 +248,10 @@ function Nav1({user}) {
   );
 }
 
-function Nav2({user}) {
+function Nav2() {
+  const products = useSelector((state) => state.productsData.data);
+  const user = useSelector((state) => state.userData.data);
+
   const closeMenuButton = useRef(null);
 
   const [searchValue, setSearchValue] = useState("");
@@ -325,7 +408,7 @@ function Nav2({user}) {
           </li>
           <li className={styles.sideNavItem}>
             <Link href={user ? "../pages/myaccount" : "../pages/sign"} onClick={() => closeMenuButton.current.click()}>
-              <FontAwesomeIcon icon="fa-solid fa-user" /> {user != null ? "My account" : "Sign in"}
+              <FontAwesomeIcon icon="fa-solid fa-user" /> {user ? "My account" : "Sign in"}
             </Link>
           </li>
         </div>
@@ -335,32 +418,11 @@ function Nav2({user}) {
 }
 
 export default function Nav() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      let token = localStorage.getItem('token');
-
-      if (!token) {
-          token = sessionStorage.getItem('token');
-      }
-
-      const res = await fetch("/api/user", {
-          headers: {
-              'token': `${token}`
-          }
-      });
-
-      const data = await res.json();
-      setUser(data.user);
-    };
-    fetchUser();
-  }, []);
 
   return (
     <div className={styles.main}>
-      <Nav1 user={user}/>
-      <Nav2 user={user}/>
+      <Nav1 />
+      <Nav2 />
     </div>
   );
 }

@@ -3,17 +3,7 @@ import styles from "./page.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-
 import Link from "next/link";
-
-import { useEffect, useState } from "react";
-
-library.add(fab, fas, far);
 
 function WishlistItem() {
     return (
@@ -45,13 +35,6 @@ function WishlistItem() {
 }
 
 export default function Wishlist() {
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            import('bootstrap/dist/js/bootstrap.bundle.min.js');
-        }
-    }, []);
-
     return (
         <>
             <div className={`container ${styles.main}`} >

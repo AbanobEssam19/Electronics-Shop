@@ -9,6 +9,7 @@ server.use(express.json());
 
 const users = require('./models/users');
 const products = require('./models/products');
+const carts = require('./models/carts');
 
 const bcrypt = require('bcrypt');
 
@@ -145,10 +146,78 @@ app.prepare().then(() => {
     });
 
     server.get("/api/user", authenticateToken, async (req, res) => {
-        let user = await users.findById(req.user.id);
+        const user = await users.findById(req.user.id);
         return res.json({ user: user });
     });
 
+    server.get("/api/carts", async (req, res) => {
+        const cart = await carts.find();
+        return res.json({ carts: cart });
+    });
+
+    server.post("/api/cartitem/:id/:quantity", authenticateToken, async (req, res) => {
+        const userID = req.user.id;
+        const productID = req.params.id;
+        const quantity = req.params.quantity;
+
+        const data = {
+            product: productID,
+            quantity: quantity
+        };
+
+        const cart = await carts.insertMany([data]);
+        
+        const user = await users.findById(userID);
+        let newCart = [...user.cart];
+
+        newCart.push(cart[0].id);
+        
+        await users.updateOne({_id: userID}, {$set: {cart: newCart}})
+        
+        const newUser = await users.findById(userID);
+
+        const newCarts = await carts.find();
+
+        return res.json({success: true, user: newUser, carts: newCarts});
+    });
+
+    server.delete("/api/cartitem/:id", authenticateToken, async (req, res) => {
+        const userID = req.user.id;
+        const cartID = req.params.id;
+
+        const user = await users.findById(userID);
+
+        let newCart = [];
+
+        for (const item of user.cart) {
+            if (item == cartID) {
+                await carts.findByIdAndDelete(item);
+            } 
+            else {
+                newCart.push(item);
+            }
+        }
+
+        await users.findByIdAndUpdate(userID, { $set: { cart: newCart } });
+
+        const newUser = await users.findById(userID);
+
+        return res.json({success: true, user: newUser});
+    });
+
+    server.put("/api/cartitem/:id/:quantity", authenticateToken, async (req, res) => {
+        const userID = req.user.id;
+        const cartID = req.params.id;
+        const quantity = req.params.quantity;
+
+        await carts.findByIdAndUpdate(cartID, {$set: {quantity: quantity}});
+
+        const cart = await carts.find();
+
+        const newUser = await users.findById(userID);
+
+        return res.json({success: true, carts: cart, user: newUser});
+    })
 
     server.get('*', (req, res) => {
         return handle(req, res);

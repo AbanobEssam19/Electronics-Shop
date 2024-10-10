@@ -1,3 +1,4 @@
+import { udpateData, udpateModal } from "@/app/states/reducers/modalSlice";
 import styles from "./card.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -5,26 +6,56 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 
 import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { udpateUser } from "@/app/states/reducers/userSlice";
+import { udpateCarts } from "@/app/states/reducers/cartsSlice";
 
-export default function Card({ product, setCurrentProduct }) {
+export default function Card({ product }) {
 
-  const [productID, setProductID] = useState(null);
+  const dispatch = useDispatch();
 
   if (!product) {
-    return <div>Loading...</div>;  // Fallback in case product is still undefined
+    return <div>Loading...</div>;
   }
 
+  async function addItem() {
+    let token = localStorage.getItem('token');
 
-  const amountRef = useRef();
+    if (!token)
+      token = sessionStorage.getItem('token');
 
-  function increaseAmount() {
-    amountRef.current.value = parseInt(amountRef.current.value) + 1;
+    const res = await fetch(`/api/cartitem/${product._id}/${1}`, {
+      method: "POST",
+      headers: {
+        "token": `${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      dispatch(udpateUser(data.user));
+      dispatch(udpateCarts(data.carts));
+    }
   }
 
-  function decreaseAmount() {
-    if (amountRef.current.value > 1)
-      amountRef.current.value = amountRef.current.value - 1;
-  }
+  const products = useSelector((state) => state.productsData.data);
+  const user = useSelector((state) => state.userData.data);
+  const carts = useSelector((state) => state.cartsData.data);
+
+  const [inCart, setInCart] = useState(false);
+
+  useEffect(() => {
+    setInCart(false);
+    user && carts && products && user.cart.map((id) => {
+      const details = carts.find((item) => item._id == id);
+      const check = products.find((item) => item._id == details.product);
+      if (check._id == product._id) {
+        setInCart(true);
+        return;
+      }
+    });
+  }, [user])
 
   return (
     <div className={`${styles.wholeCard}`}>
@@ -47,7 +78,7 @@ export default function Card({ product, setCurrentProduct }) {
           className={`btn btn-light ${styles.eye}`}
           data-bs-toggle="modal"
           data-bs-target="#modalProduct"
-          onClick={() => {setCurrentProduct(product)}}
+          onClick={() => dispatch(udpateModal(product))}
         >
           <FontAwesomeIcon
             icon="fa-regular fa-eye"
@@ -66,14 +97,14 @@ export default function Card({ product, setCurrentProduct }) {
             {product.price}.00EGP
           </p>
         </div>
-        <button className={styles.shoppingCart}>
+        <button className={styles.shoppingCart} onClick={addItem} disabled={inCart}>
           <FontAwesomeIcon
-            icon="fa-solid fa-cart-shopping"
+            icon={`fa-solid fa-${inCart ? "check" : "cart-shopping"}`}
             style={{
               width: "30px",
               height: "14px",
               color: "black",
-              marginTop: "5px",
+              marginTop: "5px"
             }}
           />
         </button>

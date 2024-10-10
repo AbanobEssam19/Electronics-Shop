@@ -1,14 +1,6 @@
 import MyaccountSidebar from "@/app/components/MyaccountSidebar/sidebar";
+
 import styles from "./page.module.css"
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-import { library } from "@fortawesome/fontawesome-svg-core";
-
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-
-library.add(fab, fas, far);
 
 export default function AccountDetails () {
     return(
@@ -37,11 +29,6 @@ export default function AccountDetails () {
                 <input type = "text"/> <br/>
                 <input type = "submit" value = "Save Changes" className = {styles.sumbit}/>
             </form>
-            
         </div>
-
-
     )
-    
-
 }

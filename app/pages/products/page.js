@@ -6,20 +6,14 @@ import { useEffect, useRef, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-
-library.add(fab, fas, far);
-
 import { useSearchParams } from 'next/navigation';
 
 import Link from "next/link";
 import Modal from "@/app/components/Modal/modal";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCarts, fetchProducts, fetchUser } from "@/app/states/APIs/apis";
 
-export default function Products() {
+export default function Products({setCurrentUser}) {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(0);
 
@@ -27,7 +21,6 @@ export default function Products() {
   const [onSale, setOnSale] = useState(false);
   const [onStock, setOnStock] = useState(false);
 
-  const [products, setProducts] = useState([]);
   const [sorted, setSorted] = useState([]);
   const [current, setCurrent] = useState([]);
 
@@ -49,6 +42,11 @@ export default function Products() {
   const search = searchParams.get('search');
 
   const sale = searchParams.get('sale');
+
+  const products = useSelector((state) => state.productsData.data);
+  const user = useSelector((state) => state.userData.data);
+  const carts = useSelector((state) => state.cartsData.data);
+  const dispatch = useDispatch();
   
 
   function reset() {
@@ -63,6 +61,17 @@ export default function Products() {
   }
 
   useEffect(() => {
+    let token = localStorage.getItem('token');
+    if (!token)
+      token = sessionStorage.getItem('token');
+    dispatch(fetchUser(token));
+    dispatch(fetchProducts());
+  }, []);
+
+  useEffect(() => {
+    if (!products)
+      return;
+
     if (search != null) {
       setTitle(`Searching result for: "${search}"`);
     }
@@ -132,20 +141,6 @@ export default function Products() {
       setSorted(temp);
     }
   }, [sortBy]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      import("bootstrap/dist/js/bootstrap.bundle.min.js");
-    }
-    
-    function fetchProducts() {
-      fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data.products));
-    }
-
-    fetchProducts();
-  }, []);
 
   function checkSale(product) {
     if (!onSale)

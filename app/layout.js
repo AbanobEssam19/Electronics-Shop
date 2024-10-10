@@ -4,13 +4,8 @@ import Nav from "./components/Nav/nav";
 import Footer from "./components/Footer/footer";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { library } from "@fortawesome/fontawesome-svg-core";
-
-import { fab } from "@fortawesome/free-brands-svg-icons";
-import { fas } from "@fortawesome/free-solid-svg-icons";
-import { far } from "@fortawesome/free-regular-svg-icons";
-
-library.add(fab, fas, far);
+import ClientProvider from "./clientProvider";
+import Modal from "./components/Modal/modal";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,9 +27,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Nav />
-        {children}
-        <Footer />
+        <ClientProvider>
+            <Nav />
+            {children}
+            <Footer />
+            <Modal />
+        </ClientProvider>
       </body>
     </html>
   );

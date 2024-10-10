@@ -3,41 +3,97 @@ import styles from "./page.module.css";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-
-import { fab } from '@fortawesome/free-brands-svg-icons'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-
 import Link from "next/link";
-
-library.add(fab, fas, far);
 
 import ProgressBar from '@/app/components/ProgressBar/bar';
 
 import { useRef } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import { udpateUser } from "@/app/states/reducers/userSlice";
+import { useState } from "react";
+import { udpateCarts } from "@/app/states/reducers/cartsSlice";
+import { useEffect } from "react";
 
-function CartItem() {
+function CartItem({product, cart}) {
 
-    function removeItem(e) {
-        e.target.closest(`.${styles.item}`).remove();
+    
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.userData.data);
+    const carts = useSelector((state) => state.cartsData.data);
+    const products = useSelector((state) => state.productsData.data);
+
+    async function removeItem() {
+        let token = localStorage.getItem('token');
+
+        if (!token)
+            token = sessionStorage.getItem('token');
+
+        const res = await fetch(`/api/cartitem/${cart._id}`, {
+            method: "DELETE",
+            headers: {
+                'token': `${token}`
+            }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            dispatch(udpateUser(data.user));
+        }
+    }
+
+    const [itemQuantity, setItemQuantity] = useState(cart.quantity);
+
+    const quantityInput = useRef(null);
+
+    useEffect(() => {
+        quantityInput.current.value = cart.quantity;
+        setItemQuantity(cart.quantity);
+    }, [cart]);
+
+    async function setQuantity(num) {
+        const quantity = (quantityInput.current.value != "" && parseInt(quantityInput.current.value)) + parseInt(num);
+        
+        if (quantity <= 0) {
+            removeItem();
+            return;
+        }
+
+        let token = localStorage.getItem('token');
+
+        if (!token)
+            token = sessionStorage.getItem('token');
+
+        const res = await fetch(`/api/cartitem/${cart._id}/${quantity}`, {
+            method: "PUT",
+            headers: {
+                'token': `${token}`
+            }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            dispatch(udpateCarts(data.carts));
+            dispatch(udpateUser(data.user));
+            quantityInput.current.value = quantity;
+            setItemQuantity(quantity);
+        }
     }
 
     return (
         <tr className={styles.item} >
             <td>
-                <img src='https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg' />
-                <p>AC Light Dimmer SCR (220V-2000W) and AC Motor</p>
+                <img src={product.photo[0]} />
+                <p>{product.name}</p>
             </td>
-            <td className={styles.price} >100.00 EGP</td>
+            <td className={styles.price} >{product.price}.00 EGP</td>
             <td>
                 <div className={styles.amountContainer}>
-                    <button>-</button>
-                    <input type="number" value={1} />
-                    <button >+</button>
+                    <button onClick={() => setQuantity(-1)}>-</button>
+                    <input type="number" ref={quantityInput} onBlur={() => setQuantity(0)} />
+                    <button onClick={() => setQuantity(1)}>+</button>
                 </div>
             </td>
-            <td className={styles.total} >100.00 EGP</td>
+            <td className={styles.total} >{itemQuantity * product.price}.00 EGP</td>
             <td>
                 <button onClick={removeItem}>
                     <FontAwesomeIcon
@@ -50,11 +106,14 @@ function CartItem() {
 
 export default function ShoppingCart() {
 
+    const user = useSelector((state) => state.userData.data);
+    const carts = useSelector((state) => state.cartsData.data);
+    const products = useSelector((state) => state.productsData.data);
+
     const shippingText  = useRef();
 
     function ShippingDeclaration(e) {
         let id = e.target.id;
-        console.log(id);
         if (id == "shipping") {
             shippingText.current.innerText = "Shipping price will be added during checkout";
         }
@@ -62,6 +121,20 @@ export default function ShoppingCart() {
             shippingText.current.innerText = "Address : 132 Shobra street - Cairo - Egypt";
         }
     }
+
+    const [total, setTotal] = useState(0);
+
+    useEffect(() => {
+        let newTotal = 0;
+        user && carts && products && user.cart.map((id) => {
+        const details = carts.find((cart) => cart._id == id);
+        if (details) {
+            const product = products.find((product) => product._id == details.product);
+            newTotal += product.price * details.quantity;
+        }
+        });
+        setTotal(newTotal);
+    }, [user]);
 
     return (
         <>
@@ -79,21 +152,20 @@ export default function ShoppingCart() {
                             </tr>
                         </thead>
                         <tbody>
-                            <CartItem />
-                            <CartItem />
-                            <CartItem />
-                            <CartItem />
-                            <CartItem />
-                            <CartItem />
-                            <CartItem />
-                            <CartItem />
+                            {
+                                user && products && carts && user.cart.map((id) => {
+                                    const cart = carts.find((item) => item._id == id);
+                                    const product = products.find((item) => item._id == cart.product);
+                                    return <CartItem product={product} cart={cart} />;
+                                })
+                            }
                         </tbody>
                     </table>
                     <div className={styles.totalSection}>
                         <p>CART TOTAL</p>
                         <div className={styles.section}>
                             <strong>Subtotal</strong>
-                            <p>100.00 EGP</p>
+                            <p>{total}.00 EGP</p>
                         </div>
                         <div className={`${styles.shippingOptions} ${styles.section}`} >
                             <strong>Shipping</strong>
@@ -111,9 +183,9 @@ export default function ShoppingCart() {
                         </div>
                         <div className={styles.section} >
                             <strong>Total</strong>
-                            <p>100.00 EGP</p>
+                            <p>{total}.00 EGP</p>
                         </div>
-                        <Link href="/" >Proceed to checkout</Link>
+                        <Link href="/pages/checkout" >Proceed to checkout</Link>
                     </div>
                 </div>
             </div>

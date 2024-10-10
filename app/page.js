@@ -3,50 +3,23 @@ import styles from "./page.module.css";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-
-import { fab } from '@fortawesome/free-brands-svg-icons'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-library.add(fab, fas, far);
-
 import Link from "next/link";
-
 
 import Card from './components/Card/card';
 
 import { useEffect, useRef, useState } from "react";
 
-import Modal from "./components/Modal/modal";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProducts, fetchUser } from "./states/APIs/apis";
 
 export default function Home() {
-
-  const [products, setProducts] = useState([]);
-
-  const [currentProduct, setCurrentProduct] = useState(null);
-
-  useEffect(() => {
-      if (typeof window !== 'undefined') {
-        import('bootstrap/dist/js/bootstrap.bundle.min.js');
-      }
-
-      function fetchProducts() {
-        fetch("/api/products")
-        .then((res) => res.json())
-        .then((data) => setProducts(data.products));
-      }
-  
-      fetchProducts();
-  }, []);
-  
   return (
     <div className={styles.mainPage}>
       <div className={styles.mainContent}>
         <Carousel />
-        <SpecialOffers products={products} setCurrentProduct={setCurrentProduct} />
-        <NewProducts products={products} setCurrentProduct={setCurrentProduct} />
+        <SpecialOffers />
+        <NewProducts />
       </div>
-      <Modal currentProduct={currentProduct} />
     </div>
   );
 }
@@ -82,10 +55,15 @@ function Carousel() {
   );
 }
 
-function SpecialOffers({products, setCurrentProduct}) {
+function SpecialOffers() {
+
+  const products = useSelector((state) => state.productsData.data);
+
   const [arr, setArr] = useState([]);
 
   useEffect(() => {
+    if (!products)
+      return;
     const filtered = [...products].filter((product) => product.discount > 0);
     setArr(filtered);
   }, [products]);
@@ -108,25 +86,29 @@ function SpecialOffers({products, setCurrentProduct}) {
         <Link href="/pages/products?category=all&sale=1">View All →</Link>
       </div>
       <div className={styles.content} >
-        <button onClick={slideLeft}>&lt;</button>
+        <button onClick={slideLeft} className={styles.sliderButton}>&lt;</button>
         <div className={styles.cardContainer} ref={container} >
           {
             arr.slice(0, Math.min(arr.length, 10)).map((product) => (
-              <Card product={product} setCurrentProduct={setCurrentProduct} />
+              <Card product={product} />
             ))
           }
         </div>
-        <button onClick={slideRight}>&gt;</button>
+        <button onClick={slideRight} className={styles.sliderButton}>&gt;</button>
       </div>
     </div>
   );
 }
 
-function NewProducts({products, setCurrentProduct}) {
+function NewProducts() {
+
+  const products = useSelector((state) => state.productsData.data);
 
   const [arr, setArr] = useState([]);
 
   useEffect(() => {
+    if (!products)
+      return;
     const sorted = [...products].sort((a, b) => new Date(b.date) - new Date(a.date));
     setArr(sorted);
   }, [products]);
@@ -148,15 +130,15 @@ function NewProducts({products, setCurrentProduct}) {
         <Link href="/pages/products?category=all">View All →</Link>
       </div>
       <div className={styles.content} >
-        <button onClick={slideLeft}>&lt;</button>
+        <button onClick={slideLeft} className={styles.sliderButton}>&lt;</button>
         <div className={styles.cardContainer} ref={container} >
           {
             arr.slice(0, Math.min(arr.length, 10)).map((product) => (
-              <Card product={product} setCurrentProduct={setCurrentProduct} />
+              <Card product={product} />
             ))
           }
         </div>
-        <button onClick={slideRight}>&gt;</button>
+        <button onClick={slideRight} className={styles.sliderButton}>&gt;</button>
       </div>
     </div>
   );

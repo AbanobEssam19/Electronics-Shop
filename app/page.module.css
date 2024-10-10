@@ -63,7 +63,7 @@
   flex-shrink: 0;
 }
 
-.content button {
+.content button.sliderButton {
   background-color: transparent;
   border: 0;
 }

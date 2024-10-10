@@ -322,7 +322,7 @@
 
 .itemContainer {
     overflow: auto;
-    max-height: 80%;
+    height: 80%;
 }
 
 .cartItemContainer {
@@ -350,11 +350,15 @@
     flex-direction: column;
     position: relative;
     justify-content: space-between;
+    width: 100%;
 }
 
 .itemInfoHead {
     display: flex;
     justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    align-items: flex-start;
 }
 
 .itemInfoHead button {
