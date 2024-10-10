@@ -50,8 +50,8 @@
 }
 .order {
   padding: 20px;
-  width: 400px;
-  height: 591px;
+  width: 40%;
+  height: fit-content;
   border: 2px solid var(--main);
   border-radius: 8px;
   -webkit-border-radius: 8px;
@@ -61,6 +61,10 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.order tbody tr td:first-of-type {
+  width: 50%;
 }
 .order > * {
   position: relative;
@@ -75,16 +79,16 @@
   left: 0;
 }
 
-.order > .group::after {
+.order > .group::before {
   content: "";
   position: absolute;
   width: 100%;
   height: 1px;
   background-color: rgba(0, 0, 0, 0.237);
-  bottom: -10px;
+  top: -10px;
   left: 0;
 }
-.order h6:first-child::after {
+/* .order h6:first-child::after {
   content: "";
   position: absolute;
   width: 100%;
@@ -92,7 +96,7 @@
   background-color: rgba(0, 0, 0, 0.237);
   bottom: -20px;
   left: 0;
-}
+} */
 .order table thead {
   position: relative;
 }
@@ -137,7 +141,7 @@
     align-items: center;
   }
 
-  .formClass {
+  .formClass, .order {
     width: 100%;
   }
 }
@@ -145,7 +149,42 @@
   .inputCollection{
     width: 60%;
   }
-  .order{
-    width: 300px;
-  }
+}
+
+.orderTable {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+.orderHeader {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.orderHeader p {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.orderBody {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  gap: 20px;
+}
+
+.orderData {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.orderData p:first-of-type {
+  max-width: 60%;
+  overflow: hidden;
 }

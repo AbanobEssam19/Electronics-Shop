@@ -10,6 +10,7 @@ server.use(express.json());
 const users = require('./models/users');
 const products = require('./models/products');
 const carts = require('./models/carts');
+const orders = require('./models/orders');
 
 const bcrypt = require('bcrypt');
 
@@ -150,6 +151,11 @@ app.prepare().then(() => {
         return res.json({ user: user });
     });
 
+    server.get("/api/orders", authenticateToken, async (req, res) => {
+        const order = await orders.find();
+        return res.json({ orders: order });
+    });
+
     server.get("/api/carts", async (req, res) => {
         const cart = await carts.find();
         return res.json({ carts: cart });
@@ -217,6 +223,70 @@ app.prepare().then(() => {
         const newUser = await users.findById(userID);
 
         return res.json({success: true, carts: cart, user: newUser});
+    });
+
+    server.post("/api/order/:id", async (req, res) => {
+        const {firstName, lastName, address, city, state, notes, shipping} = req.body;
+        const userID = req.params.id;
+
+        const user = await users.findById(userID);
+
+        let total = shipping && 50;
+
+        let productsArr = [];
+
+        for (const id of user.cart) {
+            const cart = await carts.findById(id);
+            productsArr.push(cart.product);
+            const product = await products.findById(cart.product);
+            total += product.price * cart.quantity;
+
+            await carts.findByIdAndDelete(id);
+        }
+
+        const ordersArr = await orders.find();
+
+        const number = ordersArr.length;
+        
+        const order = await orders.insertMany([{
+            orderID: number + 42100,
+            products: productsArr,
+            date: new Date(),
+            total: total,
+            shipping: shipping,
+            address: address,
+            notes: notes
+        }]);
+        
+        const orderID = order[0]._id
+
+        let userOrders = user.orders;
+
+        userOrders.push(orderID);
+
+        await users.updateOne({_id: userID}, {$set: {cart: [], firstname: firstName, lastname: lastName, address: address, city: city, state: state, orders: userOrders}});
+
+        const newUser = await users.findById(userID);
+
+        return res.json({success: true, user: newUser});
+        
+    });
+
+    server.post("/api/addtowishlist/:id", authenticateToken, (req, res) => {
+        const userID = req.user.id;
+        const productID = req.params.id;
+
+        const user = users.findById(userID);
+
+        let wishlistArr = user.wishlist;
+
+        wishlistArr.push(productID);
+
+        users.findByIdAndUpdate(userID, {$set: {wishlist: wishlistArr}});
+
+        const newUser = users.findById(userID);
+
+        return res.json({success: true, user: newUser});
     })
 
     server.get('*', (req, res) => {

@@ -7,9 +7,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Card from "@/app/components/Card/card";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function Main() {
+
+  const productId = useSearchParams().get("id");
+
+  const products = useSelector((state) => state.productsData.data);
+
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    if (products) {
+      const foundProduct = products.find((product) => product._id == productId);
+      setProduct(foundProduct);
+    }
+  }, [productId]);
+
   const [amount, setAmount] = useState(1);
   const amountRef = useRef();
 
@@ -22,6 +38,10 @@ export default function Main() {
       amountRef.current.value = amountRef.current.value - 1;
   }
 
+  if (!product) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <div className={`container ${styles.main}`}>
@@ -29,8 +49,7 @@ export default function Main() {
           <Carousel />
           <div className={styles.productDetails}>
             <h3 className={styles.title}>
-              AC Light Dimmer SCR (220V-2000W) and AC Motor Speed Controller
-              Module
+              {product.name}
             </h3>
             <div className={styles.state}>
               <FontAwesomeIcon icon="fa-regular fa-circle-check" />

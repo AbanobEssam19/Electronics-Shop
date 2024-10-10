@@ -60,7 +60,7 @@ export default function Card({ product }) {
   return (
     <div className={`${styles.wholeCard}`}>
       <div className={styles.cardImg}>
-        <Link href="/pages/product">
+        <Link href={`/pages/product?id=${product._id}`}>
           <img src={product.photo[0]} />
           <div className={styles.discount} style={product.discount != 0 ? {} : {display: "none"}}>{product.discount}%</div>
         </Link>

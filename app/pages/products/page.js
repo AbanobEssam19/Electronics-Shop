@@ -66,6 +66,7 @@ export default function Products({setCurrentUser}) {
       token = sessionStorage.getItem('token');
     dispatch(fetchUser(token));
     dispatch(fetchProducts());
+    dispatch(fetchCarts());
   }, []);
 
   useEffect(() => {

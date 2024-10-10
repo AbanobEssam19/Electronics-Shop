@@ -3,22 +3,18 @@ import styles from "./nav.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUser, fetchProducts, fetchCarts } from "@/app/states/APIs/apis";
 import { udpateUser } from "@/app/states/reducers/userSlice";
 import { udpateCarts } from "@/app/states/reducers/cartsSlice";
 
-function CartItem({product, cart}) {
+function CartItem({ product, cart }) {
   const dispatch = useDispatch();
- 
+
   if (!product) {
     return <div>Loading...</div>;
   }
-
-  const user = useSelector((state) => state.userData.data);
-  const products = useSelector((state) => state.productsData.data);
-  const carts = useSelector((state) => state.cartsData.data);
 
   async function removeCartItem() {
     let token = localStorage.getItem('token');
@@ -29,7 +25,7 @@ function CartItem({product, cart}) {
     const res = await fetch(`/api/cartitem/${cart._id}`, {
       method: "DELETE",
       headers: {
-         'token': `${token}`
+        'token': `${token}`
       }
     });
 
@@ -47,10 +43,10 @@ function CartItem({product, cart}) {
 
   async function setQuantity(num) {
     const quantity = parseInt(itemQuantity) + parseInt(num);
-    
+
     if (quantity <= 0) {
-        removeCartItem();
-        return;
+      removeCartItem();
+      return;
     }
 
     let token = localStorage.getItem('token');
@@ -59,17 +55,17 @@ function CartItem({product, cart}) {
       token = sessionStorage.getItem('token');
 
     const res = await fetch(`/api/cartitem/${cart._id}/${quantity}`, {
-        method: "PUT",
-        headers: {
-          'token': `${token}`
-        }
+      method: "PUT",
+      headers: {
+        'token': `${token}`
+      }
     });
 
     const data = await res.json();
     if (data.success) {
-        dispatch(udpateCarts(data.carts));
-        dispatch(udpateUser(data.user));
-        setItemQuantity(quantity);
+      dispatch(udpateCarts(data.carts));
+      dispatch(udpateUser(data.user));
+      setItemQuantity(quantity);
     }
   };
 
@@ -101,7 +97,7 @@ function CartItem({product, cart}) {
 
 function Nav1() {
   const dispatch = useDispatch();
-  
+
   const products = useSelector((state) => state.productsData.data);
   const user = useSelector((state) => state.userData.data);
   const carts = useSelector((state) => state.cartsData.data);
@@ -115,26 +111,29 @@ function Nav1() {
     dispatch(fetchCarts());
   }, []);
 
-  const [total, setTotal] = useState(0);
-  
-  useEffect(() => {
+  const total = useMemo(() => {
+    if (!user || !carts || !products) return 0;
+
     let newTotal = 0;
-    user && carts && products && user.cart.map((id) => {
-      const details = carts.find((cart) => cart._id == id);
+    user.cart.forEach((id) => {
+      const details = carts.find((cart) => cart._id === id);
       if (details) {
-        const product = products.find((product) => product._id == details.product);
-        newTotal += product.price * details.quantity;
+        const product = products.find((product) => product._id === details.product);
+        if (product) {
+          newTotal += product.price * details.quantity;
+        }
       }
     });
-    setTotal(newTotal);
-  }, [user])
+
+    return newTotal;
+  }, [user]);
 
   const cartButton = useRef(null);
   const closeCartButton = useRef(null);
 
   function checkUser() {
     if (user == null) {
-      
+
     }
     else {
       cartButton.current.click();
@@ -174,9 +173,9 @@ function Nav1() {
           icon="fa-regular fa-user"
           style={{ width: "30px", height: "25px" }}
         />
-        <div style={{display: "flex", flexDirection: "column"}}>
-          {user ? <p style={{color: "gray", fontSize: "small"}}>Welcome</p> : ""}
-          <p style={{fontWeight: "bold"}}>{user ? user.username : "Sign in"}</p>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {user ? <p style={{ color: "gray", fontSize: "small" }}>Welcome</p> : ""}
+          <p style={{ fontWeight: "bold" }}>{user ? user.username : "Sign in"}</p>
         </div>
       </Link>
 
@@ -204,9 +203,9 @@ function Nav1() {
         />
       </button>
       <button data-bs-toggle="offcanvas"
-          data-bs-target="#cartSideBar"
-          style={{display: "none"}}
-          ref={cartButton}></button>
+        data-bs-target="#cartSideBar"
+        style={{ display: "none" }}
+        ref={cartButton}></button>
       <div
         className={`offcanvas offcanvas-end`}
         id="cartSideBar"
@@ -224,11 +223,11 @@ function Nav1() {
           <div className={styles.itemContainer}>
             {
               user && carts && products && user.cart.map((id) => {
-                  const details = carts.find((cart) => cart._id == id);
-                  if (details) {
-                    const product = products.find((product) => product._id == details.product);
-                    return <CartItem product={product} cart={details} />
-                  }
+                const details = carts.find((cart) => cart._id == id);
+                if (details) {
+                  const product = products.find((product) => product._id == details.product);
+                  return <CartItem product={product} cart={details} />
+                }
               })
             }
           </div>
@@ -239,7 +238,6 @@ function Nav1() {
             </div>
             <div className={styles.footerLinks}>
               <Link href="../pages/cart" onClick={() => closeCartButton.current.click()} >VIEW CART</Link>
-              <Link href="../pages/checkout" onClick={() => closeCartButton.current.click()} >CHECKOUT</Link>
             </div>
           </div>
         </div>
@@ -249,7 +247,6 @@ function Nav1() {
 }
 
 function Nav2() {
-  const products = useSelector((state) => state.productsData.data);
   const user = useSelector((state) => state.userData.data);
 
   const closeMenuButton = useRef(null);
@@ -277,7 +274,7 @@ function Nav2() {
                   <Link href="/pages/products?category=motor">Motors</Link>
                 </li>
                 <li>
-                <Link href="/pages/products?category=led">LED</Link>
+                  <Link href="/pages/products?category=led">LED</Link>
                 </li>
                 <li>
                   <Link href="/pages/products?category=module">Modules</Link>

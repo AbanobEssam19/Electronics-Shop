@@ -2,12 +2,14 @@ const mongoose = require('mongoose');
 
 const Orders = mongoose.model('Orders', 
     {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' },
+        orderID: Number,
         products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' }],
         date: Date,
         total: Number,
         shipping: Boolean,
-        address: String
+        address: String,
+        status: {type: String, default: "Processing"},
+        notes: {type: String, default: ""}
     }
 )
 
