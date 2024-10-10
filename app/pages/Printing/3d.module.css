@@ -38,18 +38,18 @@
   margin: 5px; /* Space between buttons */
   border: none; /* No border */
   border-radius: 5px; /* Rounded corners */
-  background-color: #007bff; /* Blue background */
+  background-color: #ce9b1b; /* Blue background */
   color: white; /* White text */
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s; /* Smooth background transition */
 }
 
 .button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #ce9b1b; /* Darker blue on hover */
 }
 
 .selected {
-  background-color: #0056b3; /* Selected button color */
+  background-color: #ce9b1b; /* Selected button color */
 }
 
 /* Input styles */
@@ -65,7 +65,7 @@
 }
 
 .inputfield:focus {
-  border-color: #007bff; /* Blue border on focus */
+  border-color: #ce9b1b; /* Blue border on focus */
 }
 
 /* Checkbox styling */
