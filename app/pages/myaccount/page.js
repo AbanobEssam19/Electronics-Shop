@@ -1,8 +1,17 @@
+'use client'
 import MyaccountSidebar from "@/app/components/MyaccountSidebar/sidebar";
 
 import styles from "./page.module.css"
+import { useSelector } from "react-redux";
+import Error from "../Error/page";
 
 export default function AccountDetails () {
+    const user = useSelector((state) => state.userData.data);
+
+    if (!user) {
+        return <Error />;
+    }
+    
     return(
         <div className={`container ${styles.AccountDetails}`} style={{minHeight : "500px"}}>
             <MyaccountSidebar num ={1} />

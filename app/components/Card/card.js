@@ -1,4 +1,4 @@
-import { udpateData, udpateModal } from "@/app/states/reducers/modalSlice";
+import { updateModal } from "@/app/states/reducers/modalSlice";
 import styles from "./card.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,8 +7,10 @@ import Link from "next/link";
 
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { udpateUser } from "@/app/states/reducers/userSlice";
-import { udpateCarts } from "@/app/states/reducers/cartsSlice";
+import { updateUser } from "@/app/states/reducers/userSlice";
+import { updateCarts } from "@/app/states/reducers/cartsSlice";
+
+import alertStyles from "@/app/components/Alerts/alerts.module.css";
 
 export default function Card({ product }) {
   const dispatch = useDispatch();
@@ -31,9 +33,26 @@ export default function Card({ product }) {
 
     const data = await res.json();
 
+    const alert = document.getElementById("alertContainer");
+
     if (data.success) {
-      dispatch(udpateUser(data.user));
-      dispatch(udpateCarts(data.carts));
+      dispatch(updateUser(data.user));
+      dispatch(updateCarts(data.carts));
+      
+      alert.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          <strong>Success!</strong> Item added to cart.
+        </div>
+      `;
+    }
+    else {
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
     }
   }
 
@@ -57,7 +76,7 @@ export default function Card({ product }) {
           return;
         }
       });
-  }, [user]);
+  }, [user, product]);
   useEffect(() => {
     setInWishList(false);
     if (user && product) {
@@ -83,7 +102,7 @@ export default function Card({ product }) {
     const data = await res.json();
     if (data.success) {
       setInWishList(!inWishList);
-      dispatch(udpateUser(data.user));
+      dispatch(updateUser(data.user));
     } 
   };
   return (
@@ -113,7 +132,7 @@ export default function Card({ product }) {
           className={`btn btn-light ${styles.eye}`}
           data-bs-toggle="modal"
           data-bs-target="#modalProduct"
-          onClick={() => dispatch(udpateModal(product))}
+          onClick={() => dispatch(updateModal(product))}
         >
           <FontAwesomeIcon
             icon="fa-regular fa-eye"

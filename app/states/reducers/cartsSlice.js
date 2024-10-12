@@ -9,7 +9,7 @@ export const cartsSlice = createSlice({
     },
 
     reducers: {
-        udpateCarts: (state, action) => {
+        updateCarts: (state, action) => {
             state.data = action.payload;
         }
     },
@@ -20,5 +20,5 @@ export const cartsSlice = createSlice({
     }
 });
 
-export const { udpateCarts } = cartsSlice.actions;
+export const { updateCarts } = cartsSlice.actions;
 export default cartsSlice.reducer;

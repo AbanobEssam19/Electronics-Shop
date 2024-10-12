@@ -29,7 +29,7 @@
 .AccountDetails form .sumbit {
     width: 120px;
     border-color: none;
-    background-color: #ff6600;
+    background-color: var(--main);
     color: white;
 }
 

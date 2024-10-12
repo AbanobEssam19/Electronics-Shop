@@ -1,11 +1,12 @@
 "use client";
-import { udpateUser } from "@/app/states/reducers/userSlice";
+import { updateUser } from "@/app/states/reducers/userSlice";
 import styles from "./page.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
 function WishlistItem({ id, selectedItems, setSelectedItems }) {
   const products = useSelector((state) => state.productsData.data);
@@ -84,7 +85,8 @@ export default function Wishlist() {
     const data = await res.json();
     if (data.success) {
       console.log(data.user);
-      dispatch(udpateUser(data.user));
+      dispatch(updateUser(data.user));
+      dispatch(updateCarts(data.carts));
     }
   };
   return (

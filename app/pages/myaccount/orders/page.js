@@ -4,6 +4,7 @@ import MyaccountSidebar from "@/app/components/MyaccountSidebar/sidebar";
 import styles from "./page.module.css";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Error from "../../Error/page";
 
 function OrderDetails ({order}) {
     if (!order)
@@ -14,7 +15,7 @@ function OrderDetails ({order}) {
             <p style = {{color: "red"}}>#{order.orderID}</p>
             <p style = {{color: "grey"}}>{date.toLocaleDateString()}</p>
             <p style = {{color: "grey"}}>{order.status}</p>
-            <p style = {{color: "black"}}>{order.total} EGP <span style = {{color: "grey"}}>for {order.products.length} item{order.products.length > 1 ? "s" : ""}</span></p>
+            <p style = {{color: "black"}}>{order.total} EGP</p>
         </div>
     )
 }
@@ -47,8 +48,7 @@ export default function Orders () {
     }, []);
 
     if (!user || !orders) {
-        console.log(orders);
-        return <div>Error 404</div>;
+        return <Error />;
     }
 
     return(
@@ -61,15 +61,13 @@ export default function Orders () {
                     <p>STATUS</p>
                     <p>TOTAL</p>
                 </div>
-
                 {
                     user.orders.map((id) => {
                         const order = orders.find((order) => order._id === id);
-                        return <OrderDetails order={order} />;
+                        return <OrderDetails key={order._id} order={order} />;
                     })
                 }
             </div>
-
         </div>
     )
 }

@@ -13,7 +13,7 @@ const Users = mongoose.model('Users',
         address: {type: String, default: ""},
         phone: {type: String, default: ""},
         city: {type: String, default: ""},
-        state: {type: String, default: ""},
+        region: {type: String, default: ""},
         orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Orders' , default: []}]
     }
 )

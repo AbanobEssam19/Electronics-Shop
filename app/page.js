@@ -90,7 +90,7 @@ function SpecialOffers() {
         <div className={styles.cardContainer} ref={container} >
           {
             arr.slice(0, Math.min(arr.length, 10)).map((product) => (
-              <Card product={product} />
+              <Card key={product._id} product={product} />
             ))
           }
         </div>
@@ -134,7 +134,7 @@ function NewProducts() {
         <div className={styles.cardContainer} ref={container} >
           {
             arr.slice(0, Math.min(arr.length, 10)).map((product) => (
-              <Card product={product} />
+              <Card key={product._id} product={product} />
             ))
           }
         </div>

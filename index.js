@@ -187,15 +187,20 @@ app.prepare().then(() => {
 
       newCart.push(cart[0].id);
 
-      await users.updateOne({ _id: userID }, { $set: { cart: newCart } });
+      await users.updateOne({ _id: userID }, { $set: { cart: newCart } })
 
       const newUser = await users.findById(userID);
 
+      const product = await products.findById(productID);
+
+      await products.findByIdAndUpdate(productID, { $set: { popularity: product.popularity + 1 } });
+
+      const newProducts = await products.find();
+
       const newCarts = await carts.find();
 
-      return res.json({ success: true, user: newUser, carts: newCarts });
-    }
-  );
+      return res.json({ success: true, user: newUser, carts: newCarts, products: newProducts });
+    });
 
   server.delete("/api/cartitem/:id", authenticateToken, async (req, res) => {
     const userID = req.user.id;
@@ -205,10 +210,15 @@ app.prepare().then(() => {
 
     let newCart = [];
 
+    let productID;
+
     for (const item of user.cart) {
       if (item == cartID) {
+        const cart = await carts.findById(cartID);
+        productID = cart.product;
         await carts.findByIdAndDelete(item);
-      } else {
+      }
+      else {
         newCart.push(item);
       }
     }
@@ -217,7 +227,15 @@ app.prepare().then(() => {
 
     const newUser = await users.findById(userID);
 
-    return res.json({ success: true, user: newUser });
+    const product = await products.findById(productID);
+
+    await products.findByIdAndUpdate(productID, { $set: { popularity: product.popularity - 1 } });
+
+    const newProducts = await products.find();
+
+    const newCarts = await carts.find();
+
+    return res.json({ success: true, user: newUser, carts: newCarts, products: newProducts });
   });
 
   server.put(
@@ -239,13 +257,12 @@ app.prepare().then(() => {
   );
 
   server.post("/api/order/:id", async (req, res) => {
-    const { firstName, lastName, address, city, state, notes, shipping } =
-      req.body;
+    const { firstName, lastName, address, city, region, notes, shipping } = req.body;
     const userID = req.params.id;
 
     const user = await users.findById(userID);
 
-    let total = shipping && 50;
+    let total = shipping;
 
     let productsArr = [];
 
@@ -262,38 +279,25 @@ app.prepare().then(() => {
 
     const number = ordersArr.length;
 
-    const order = await orders.insertMany([
-      {
-        orderID: number + 42100,
-        products: productsArr,
-        date: new Date(),
-        total: total,
-        shipping: shipping,
-        address: address,
-        notes: notes,
-      },
-    ]);
+    const order = await orders.insertMany([{
+      orderID: number + 42100,
+      products: productsArr,
+      date: new Date(),
+      total: total,
+      shipping: shipping ? true : false,
+      city: city,
+      region: region,
+      address: address,
+      notes: notes
+    }]);
 
-    const orderID = order[0]._id;
+    const orderID = order[0]._id
 
     let userOrders = user.orders;
 
     userOrders.push(orderID);
 
-    await users.updateOne(
-      { _id: userID },
-      {
-        $set: {
-          cart: [],
-          firstname: firstName,
-          lastname: lastName,
-          address: address,
-          city: city,
-          state: state,
-          orders: userOrders,
-        },
-      }
-    );
+    await users.updateOne({ _id: userID }, { $set: { cart: [], firstname: firstName, lastname: lastName, address: address, city: city, region: region, orders: userOrders } });
 
     const newUser = await users.findById(userID);
 
@@ -326,21 +330,22 @@ app.prepare().then(() => {
     let user = req.body;
     let wishlist = user.wishlist;
     let cart100 = [...user.cart];
-    wishlist.forEach(async (id) => {
-      const data = {
-        product: id,
-        quantity: 1,
-      };
-      const cart = await carts.insertMany([data]);
-      cart100.push(cart[0].id);
-    });
+    for (const id of wishlist) {
+      const cart = await carts.insertMany([
+        {
+          product: id,
+          quantity: 1,
+        }
+      ]);
+      cart100.push(cart[0]._id);
+    }
     await users.updateOne(
       { _id: user._id },
       { $set: { wishlist: [], cart: cart100 } }
     );
     const newUser = await users.findById(user._id);
-    console.log(newUser);
-    return res.json({ success: true, user: newUser });
+    const newCarts = await carts.find();
+    return res.json({ success: true, user: newUser, carts: newCarts });
   });
   server.get("*", (req, res) => {
     return handle(req, res);
