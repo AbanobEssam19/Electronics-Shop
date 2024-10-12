@@ -11,7 +11,6 @@ import { udpateUser } from "@/app/states/reducers/userSlice";
 import { udpateCarts } from "@/app/states/reducers/cartsSlice";
 
 export default function Card({ product }) {
-
   const dispatch = useDispatch();
 
   if (!product) {
@@ -19,16 +18,15 @@ export default function Card({ product }) {
   }
 
   async function addItem() {
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem("token");
 
-    if (!token)
-      token = sessionStorage.getItem('token');
+    if (!token) token = sessionStorage.getItem("token");
 
     const res = await fetch(`/api/cartitem/${product._id}/${1}`, {
       method: "POST",
       headers: {
-        "token": `${token}`
-      }
+        token: `${token}`,
+      },
     });
 
     const data = await res.json();
@@ -44,34 +42,71 @@ export default function Card({ product }) {
   const carts = useSelector((state) => state.cartsData.data);
 
   const [inCart, setInCart] = useState(false);
-
+  const [inWishList, setInWishList] = useState(false);
+  const heartIconRef = useRef(null);
   useEffect(() => {
     setInCart(false);
-    user && carts && products && user.cart.map((id) => {
-      const details = carts.find((item) => item._id == id);
-      const check = products.find((item) => item._id == details.product);
-      if (check._id == product._id) {
-        setInCart(true);
-        return;
-      }
+    user &&
+      carts &&
+      products &&
+      user.cart.map((id) => {
+        const details = carts.find((item) => item._id == id);
+        const check = products.find((item) => item._id == details.product);
+        if (check._id == product._id) {
+          setInCart(true);
+          return;
+        }
+      });
+  }, [user]);
+  useEffect(() => {
+    setInWishList(false);
+    if (user && product) {
+      const inside = user.wishlist.find((el) => el == product._id);
+      if (inside) setInWishList(true);
+    }
+  }, [user]);
+  useEffect(() => {
+    if (inWishList) {
+      heartIconRef.current.style.color = "red";
+    } else {
+      heartIconRef.current.style.color = "black";
+    }
+  }, [inWishList]);
+  const wishListHandler = async () => {
+    const res = await fetch(`/api/addtowishlist/${product._id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
     });
-  }, [user])
-
+    const data = await res.json();
+    if (data.success) {
+      setInWishList(!inWishList);
+      dispatch(udpateUser(data.user));
+    } 
+  };
   return (
     <div className={`${styles.wholeCard}`}>
       <div className={styles.cardImg}>
         <Link href={`/pages/product?id=${product._id}`}>
           <img src={product.photo[0]} />
-          <div className={styles.discount} style={product.discount != 0 ? {} : {display: "none"}}>{product.discount}%</div>
+          <div
+            className={styles.discount}
+            style={product.discount != 0 ? {} : { display: "none" }}
+          >
+            {product.discount}%
+          </div>
         </Link>
-        <Link href="/" className={styles.wish}>
-          <div className={styles.wishList}>
+        <div className={styles.wish}>
+          <button className={styles.wishList} onClick={wishListHandler}>
             <FontAwesomeIcon
+              ref={heartIconRef}
               icon="fa-regular fa-heart"
               style={{ width: "35px", height: "14px", color: "black" }}
             />
-          </div>
-        </Link>
+          </button>
+        </div>
         {/* <!-- Button trigger modal --> */}
         <button
           type="button"
@@ -85,26 +120,29 @@ export default function Card({ product }) {
             style={{ width: "35px", height: "14px", color: "black" }}
           />
         </button>
-
       </div>
       <Link href="/" className={styles.anchor}>
         <h3 className={styles.title}>{product.name}</h3>
       </Link>
       <div className={styles.lowerPart}>
         <div className={styles.price}>
-          <span style={product.discount != 0 ? {} : {display: "none"}}>{Math.floor((product.price / (100 - product.discount)) * 100)}.00EGP</span>
-          <p>
-            {product.price}.00EGP
-          </p>
+          <span style={product.discount != 0 ? {} : { display: "none" }}>
+            {Math.floor((product.price / (100 - product.discount)) * 100)}.00EGP
+          </span>
+          <p>{product.price}.00EGP</p>
         </div>
-        <button className={styles.shoppingCart} onClick={addItem} disabled={inCart}>
+        <button
+          className={styles.shoppingCart}
+          onClick={addItem}
+          disabled={inCart}
+        >
           <FontAwesomeIcon
             icon={`fa-solid fa-${inCart ? "check" : "cart-shopping"}`}
             style={{
               width: "30px",
               height: "14px",
               color: "black",
-              marginTop: "5px"
+              marginTop: "5px",
             }}
           />
         </button>
