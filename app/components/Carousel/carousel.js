@@ -1,6 +1,6 @@
 "use client";
 import styles from "./carousel.module.css";
-function Carousel() {
+function Carousel({ product }) {
   return (
     <div
       id="mainCarousel"
@@ -27,18 +27,17 @@ function Carousel() {
       </div>
 
       <div className={`carousel-inner ${styles.carouselInner}`}>
-        <div className={`carousel-item active ${styles.carouselItem}`}>
-          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" className="d-block w-100" />
-        </div>
-        <div className={`carousel-item ${styles.carouselItem}`}>
-          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" className="d-block w-100" />
-        </div>
-        <div className={`carousel-item ${styles.carouselItem}`}>
-          <img src="https://res.cloudinary.com/dckocjoan/image/upload/v1727711600/ac_light_dimmer_1.jpg" className="d-block w-100" />
-        </div>
+        {product.photo.map((photo) => (
+          <>
+            <div className={`carousel-item active ${styles.carouselItem}`}>
+              <img src={photo} className="d-block w-100" />
+            </div>
+          </>
+        ))}
       </div>
 
       <button
+        style={product.photo.length == 1 ? { display: "none" } : {}}
         className="carousel-control-prev"
         type="button"
         data-bs-target="#mainCarousel"
@@ -49,6 +48,7 @@ function Carousel() {
         ></span>
       </button>
       <button
+        style={product.photo.length == 1 ? { display: "none" } : {}}
         className="carousel-control-next"
         type="button"
         data-bs-target="#mainCarousel"
