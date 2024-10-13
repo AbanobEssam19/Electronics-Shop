@@ -94,6 +94,20 @@
     color: #00a046;
 }
 
+
+.state2 {
+    width: 120px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.state2 p,
+.state2 path {
+    color: red;
+}
+
 .center {
     display: flex;
     justify-content: center;

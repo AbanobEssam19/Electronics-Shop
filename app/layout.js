@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import ClientProvider from "./clientProvider";
 import Modal from "./components/Modal/modal";
+import LoginModal from "./components/Alerts/alerts";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,10 +29,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ClientProvider>
-            <Nav />
-            {children}
-            <Footer />
-            <Modal />
+          <LoginModal />
+          <Nav />
+          {children}
+          <Footer />
+          <Modal />
         </ClientProvider>
       </body>
     </html>

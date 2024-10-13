@@ -6,8 +6,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { udpateUser } from "@/app/states/reducers/userSlice";
-import { udpateCarts } from "@/app/states/reducers/cartsSlice";
+import { updateUser } from "@/app/states/reducers/userSlice";
+import { updateCarts } from "@/app/states/reducers/cartsSlice";
+
+import alertStyles from "@/app/components/Alerts/alerts.module.css";
 
 export default function Modal() {
 
@@ -49,9 +51,26 @@ export default function Modal() {
 
     const data = await res.json();
 
+    const alert = document.getElementById("alertContainer");
+
     if (data.success) {
-      dispatch(udpateUser(data.user));
-      dispatch(udpateCarts(data.carts));
+      dispatch(updateUser(data.user));
+      dispatch(updateCarts(data.carts));
+
+      alert.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          <strong>Success!</strong> Item added to cart.
+        </div>
+      `;
+    }
+    else {
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
     }
   }
 
@@ -70,8 +89,6 @@ export default function Modal() {
       }
     });
   }, [user, product]);
-
-
 
   return (
     <div
@@ -126,7 +143,7 @@ export default function Modal() {
               </div>
               <div className={styles.buttonsBox}>
                 <div className={styles.amountContainer}>
-                <button onClick={decreaseAmount} disabled={inCart}>-</button>
+                <button onClick={decreaseAmount} disabled={(product && product.quantity == 0) || inCart}>-</button>
                 <input
                   type="number"
                   value={amount}
@@ -135,9 +152,9 @@ export default function Modal() {
                     if (e.target.value === "") e.target.value = 1;
                     setAmount(e.target.value);
                   }}
-                  disabled={inCart}
+                  disabled={(product && product.quantity == 0) || inCart}
                 />
-                <button onClick={increaseAmount} disabled={inCart}>+</button>
+                <button onClick={increaseAmount} disabled={(product && product.quantity == 0) || inCart}>+</button>
                 </div>
                 <button disabled={(product && product.quantity == 0) || inCart} onClick={addItem} >{inCart ? "In" : "Add to"} cart</button>
                 <button>

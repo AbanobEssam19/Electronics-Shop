@@ -8,11 +8,11 @@ export const modalSlice = createSlice({
     },
 
     reducers: {
-        udpateModal: (state, action) => {
+        updateModal: (state, action) => {
             state.data = action.payload;
         }
     }
 });
 
-export const { udpateModal } = modalSlice.actions;
+export const { updateModal } = modalSlice.actions;
 export default modalSlice.reducer;

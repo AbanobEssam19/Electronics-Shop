@@ -5,12 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import Link from "next/link";
 
-import ProgressBar from '@/app/components/ProgressBar/bar';
-
 import { useDispatch, useSelector } from "react-redux";
-import { udpateUser } from "@/app/states/reducers/userSlice";
-import { udpateCarts } from "@/app/states/reducers/cartsSlice";
+import { updateUser } from "@/app/states/reducers/userSlice";
+import { updateCarts } from "@/app/states/reducers/cartsSlice";
 import { useEffect, useMemo, useState, useRef } from "react";
+import EmptyCart from "../EmptyCart/page";
+import Error from "../Error/page";
 
 function CartItem({ product, cart }) {
 
@@ -32,7 +32,8 @@ function CartItem({ product, cart }) {
 
         const data = await res.json();
         if (data.success) {
-            dispatch(udpateUser(data.user));
+            dispatch(updateUser(data.user));
+            dispatch(updateCarts(data.carts));
         }
     }
 
@@ -67,8 +68,8 @@ function CartItem({ product, cart }) {
 
         const data = await res.json();
         if (data.success) {
-            dispatch(udpateCarts(data.carts));
-            dispatch(udpateUser(data.user));
+            dispatch(updateCarts(data.carts));
+            dispatch(updateUser(data.user));
             quantityInput.current.value = quantity;
             setItemQuantity(quantity);
         }
@@ -116,7 +117,7 @@ export default function ShoppingCart() {
             setShipping(true);
         }
         else if (id == "pickup") {
-            shippingText.current.innerText = "Address : 132 Shobra street - Cairo - Egypt";
+            shippingText.current.innerText = "Address : El-Abbasiya Street El Weili, Cairo - Egypt";
             setShipping(false);
         }
     }
@@ -138,9 +139,16 @@ export default function ShoppingCart() {
         return newTotal;
     }, [user]);
 
+    if (!user) {
+        return <Error />;
+    }
+
+    if (user && !user.cart.length) {
+        return <EmptyCart />;
+    }
+
     return (
         <div className={`container ${styles.main}`} >
-            <ProgressBar step={1} />
             <div className={styles.content} >
                 <table className={styles.products} >
                     <thead>
@@ -157,7 +165,7 @@ export default function ShoppingCart() {
                             user && products && carts && user.cart.map((id) => {
                                 const cart = carts.find((item) => item._id == id);
                                 const product = products.find((item) => item._id == cart.product);
-                                return <CartItem product={product} cart={cart} />;
+                                return <CartItem key={id} product={product} cart={cart} />;
                             })
                         }
                     </tbody>

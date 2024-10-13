@@ -9,7 +9,7 @@ export const productsSlice = createSlice({
     },
 
     reducers: {
-        udpateProducts: (state, action) => {
+        updateProducts: (state, action) => {
             state.data = action.payload;
         }
     },
@@ -20,5 +20,5 @@ export const productsSlice = createSlice({
     }
 });
 
-export const { udpateProducts } = productsSlice.actions;
+export const { updateProducts } = productsSlice.actions;
 export default productsSlice.reducer;

@@ -13,7 +13,7 @@ import Modal from "@/app/components/Modal/modal";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCarts, fetchProducts, fetchUser } from "@/app/states/APIs/apis";
 
-export default function Products({setCurrentUser}) {
+export default function Products() {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(0);
 
@@ -163,7 +163,7 @@ export default function Products({setCurrentUser}) {
     let last = 0;
     for (let i = 0, j = 1; i < current.length; i += arrSize, ++j) {
       temp.push(
-        <li className={`page-item ${startInd == j - 1 ? 'active' : ''}`}>
+        <li key={`item${j}`} className={`page-item ${startInd == j - 1 ? 'active' : ''}`}>
           <button className="page-link" onClick={() => setStartInd(j - 1)}>{j}</button>
         </li>
       )
@@ -172,7 +172,7 @@ export default function Products({setCurrentUser}) {
 
     
     temp.push(
-      <li className={`page-item ${startInd == last - 1 ? 'disabled' : ''}`}>
+      <li key={"next"} className={`page-item ${startInd == last - 1 ? 'disabled' : ''}`}>
         <button className="page-link" onClick={() => setStartInd(Math.min(startInd + 1, last - 1))} >Next</button>
       </li>
     )
@@ -242,12 +242,12 @@ export default function Products({setCurrentUser}) {
                     <p style={{ marginTop: "70px" }}>Product Status</p>
                   </div>
                   <div>
-                  <input type="checkbox" value="stock" id="stockCanvas" onChange={(e) => setOnStock(e.target.checked)} />
+                  <input type="checkbox" value={onStock} id="stockCanvas" onChange={(e) => setOnStock(e.target.checked)} />
                   <label htmlFor="stockCanvas" style={{ padding: "10px", fontSize: "15px" }}>
                     In Stock
                   </label>
                   <br />
-                  <input type="checkbox" value="sale" id="saleCanvas" onChange={(e) => setOnSale(e.target.checked)} />
+                  <input type="checkbox" value={onSale} id="saleCanvas" onChange={(e) => setOnSale(e.target.checked)} />
                   <label
                     htmlFor="saleCanvas"
                     style={{ padding: " 0px 10px", fontSize: "15px" }}
@@ -322,12 +322,12 @@ export default function Products({setCurrentUser}) {
               <p style={{ marginTop: "70px" }}>Product Status</p>
             </div>
             <div>
-              <input type="checkbox" value="stock" id="stock" onChange={(e) => setOnStock(e.target.checked)} />
+              <input type="checkbox" value={onStock} id="stock" onChange={(e) => setOnStock(e.target.checked)} />
               <label htmlFor="stock" style={{ padding: "10px", fontSize: "15px" }}>
                 In Stock
               </label>
               <br />
-              <input type="checkbox" value="sale" id="sale" onChange={(e) => setOnSale(e.target.checked)} />
+              <input type="checkbox" value={onSale} id="sale" onChange={(e) => setOnSale(e.target.checked)} />
               <label
                 htmlFor="sale"
                 style={{ padding: " 0px 10px", fontSize: "15px" }}
@@ -348,7 +348,7 @@ export default function Products({setCurrentUser}) {
         <div className={` row ${styles.Pagination}`}>
           <nav aria-label="Page navigation example">
             <ul className="pagination justify-content-center" ref={paginationRef}>
-              <li className={`page-item ${startInd == 0 ? 'disabled' : ''}`}>
+              <li key={"prev"} className={`page-item ${startInd == 0 ? 'disabled' : ''}`}>
                 <button className="page-link" onClick={() => setStartInd(Math.max(startInd - 1, 0))}>Previous</button>
               </li>
               {

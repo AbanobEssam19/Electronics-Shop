@@ -9,7 +9,7 @@ export const userSlice = createSlice({
     },
 
     reducers: {
-        udpateUser: (state, action) => {
+        updateUser: (state, action) => {
             state.data = action.payload;
         }
     },
@@ -20,5 +20,5 @@ export const userSlice = createSlice({
     }
 });
 
-export const { udpateUser } = userSlice.actions;
+export const { updateUser } = userSlice.actions;
 export default userSlice.reducer;

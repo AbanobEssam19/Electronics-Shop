@@ -8,6 +8,8 @@ const Orders = mongoose.model('Orders',
         total: Number,
         shipping: Boolean,
         address: String,
+        city: String,
+        region: String,
         status: {type: String, default: "Processing"},
         notes: {type: String, default: ""}
     }

@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUser, fetchProducts, fetchCarts } from "@/app/states/APIs/apis";
-import { udpateUser } from "@/app/states/reducers/userSlice";
-import { udpateCarts } from "@/app/states/reducers/cartsSlice";
+import { updateUser } from "@/app/states/reducers/userSlice";
+import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
 function CartItem({ product, cart }) {
   const dispatch = useDispatch();
@@ -31,7 +31,8 @@ function CartItem({ product, cart }) {
 
     const data = await res.json();
     if (data.success) {
-      dispatch(udpateUser(data.user));
+      dispatch(updateUser(data.user));
+      dispatch(updateCarts(data.carts));
     }
   };
 
@@ -63,8 +64,8 @@ function CartItem({ product, cart }) {
 
     const data = await res.json();
     if (data.success) {
-      dispatch(udpateCarts(data.carts));
-      dispatch(udpateUser(data.user));
+      dispatch(updateCarts(data.carts));
+      dispatch(updateUser(data.user));
       setItemQuantity(quantity);
     }
   };
@@ -161,14 +162,14 @@ function Nav1() {
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyDown={(e) => e.key == "Enter" && searchBtn.current.click()}
         />
-        <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`} ref={searchBtn}>
+        <Link className={styles.searchBtn} href={`/pages/products?search=${searchValue}`} ref={searchBtn}>
           <FontAwesomeIcon
             icon="fa-solid fa-magnifying-glass"
           />
         </Link>
       </div>
 
-      <Link href={user ? "../pages/myaccount" : "../pages/sign"} className={styles.navBtns}>
+      <Link href={user ? "/pages/myaccount" : "/pages/sign"} className={styles.navBtns}>
         <FontAwesomeIcon
           icon="fa-regular fa-user"
           style={{ width: "30px", height: "25px" }}
@@ -180,7 +181,7 @@ function Nav1() {
       </Link>
 
       <Link
-        href="../pages/wishlist"
+        href="/pages/wishlist"
         className={`${styles.navBtns} ${styles.wishlist}`}
         title="Wishlist"
       >
@@ -226,7 +227,7 @@ function Nav1() {
                 const details = carts.find((cart) => cart._id == id);
                 if (details) {
                   const product = products.find((product) => product._id == details.product);
-                  return <CartItem product={product} cart={details} />
+                  return <CartItem key={product._id} product={product} cart={details} />
                 }
               })
             }
@@ -237,7 +238,7 @@ function Nav1() {
               <p>{total}.00 EGP</p>
             </div>
             <div className={styles.footerLinks}>
-              <Link href="../pages/cart" onClick={() => closeCartButton.current.click()} >VIEW CART</Link>
+              <Link href="/pages/cart" onClick={() => closeCartButton.current.click()} >VIEW CART</Link>
             </div>
           </div>
         </div>
@@ -254,6 +255,24 @@ function Nav2() {
   const [searchValue, setSearchValue] = useState("");
   const searchBtn = useRef(null);
 
+  const products = useSelector((state) => state.productsData.data);
+
+  const [categories, setCategories] = useState(null);
+
+  useEffect(() => {
+    let set = new Set();
+
+    set.add("All");
+
+    products && products.map((product) => {
+      for (const category of product.categories) {
+        set.add(category);
+      }
+    });
+
+    setCategories([...set]);
+  }, [products]);
+
   return (
     <div className={`container-fluid ${styles.nav2}`}>
       <div className={`container ${styles.contentContainer}`}>
@@ -267,32 +286,19 @@ function Nav2() {
             </p>
             <div className={styles.categoriesDropDown}>
               <ul>
-                <li>
-                  <Link href="/pages/products?category=all">All</Link>
-                </li>
-                <li>
-                  <Link href="/pages/products?category=motor">Motors</Link>
-                </li>
-                <li>
-                  <Link href="/pages/products?category=led">LED</Link>
-                </li>
-                <li>
-                  <Link href="/pages/products?category=module">Modules</Link>
-                </li>
-                <li>
-                  <Link href="/pages/products?category=sensor">Sensors</Link>
-                </li>
-                <li>
-                  <Link href="/pages/products?category=microcontroller">Microcontrollers</Link>
-                </li>
+                {
+                  categories && categories.map((category) => {
+                    return <li key={category}><Link href={`/pages/products?category=${category.toLowerCase()}`}>{category}</Link></li>
+                  })
+                }
               </ul>
             </div>
           </li>
           <li>
-            <Link href="../pages/printing">3D Printing</Link>
+            <Link href="/pages/printing">3D Printing</Link>
           </li>
           <li>
-            <Link href="../pages/contact">Contact Us</Link>
+            <Link href="/pages/contact">Contact Us</Link>
           </li>
         </ul>
 
@@ -317,7 +323,7 @@ function Nav2() {
             onChange={(e) => setSearchValue(e.target.value)}
             onKeyDown={(e) => e.key == "Enter" && searchBtn.current.click()}
           />
-          <Link className={styles.searchBtn} href={`../pages/products?search=${searchValue}`} ref={searchBtn}>
+          <Link className={styles.searchBtn} href={`/pages/products?search=${searchValue}`} ref={searchBtn}>
             <FontAwesomeIcon
               icon="fa-solid fa-magnifying-glass"
             />
@@ -369,24 +375,17 @@ function Nav2() {
             id="categoriesCollapse"
             className={`collapse ${styles.categoriesSideNav}`}
           >
-            <li className={styles.sideNavItem}>
-              <Link href="/pages/products?category=all" onClick={() => closeMenuButton.current.click()}>All</Link>
-            </li>
-            <li className={styles.sideNavItem}>
-              <Link href="/pages/products?category=motor" onClick={() => closeMenuButton.current.click()}>Motors</Link>
-            </li>
-            <li className={styles.sideNavItem}>
-              <Link href="/pages/products?category=led" onClick={() => closeMenuButton.current.click()}>LED</Link>
-            </li>
-            <li className={styles.sideNavItem}>
-              <Link href="/pages/products?category=module" onClick={() => closeMenuButton.current.click()}>Modules</Link>
-            </li>
-            <li className={styles.sideNavItem}>
-              <Link href="/pages/products?category=sensor" onClick={() => closeMenuButton.current.click()}>Sensors</Link>
-            </li>
-            <li className={styles.sideNavItem}>
-              <Link href="/pages/products?category=microcontroller" onClick={() => closeMenuButton.current.click()}>Microcontrollers</Link>
-            </li>
+            {
+              categories && categories.map((category) => {
+                return (
+                  <li key={category} className={styles.sideNavItem}>
+                    <Link href={`/pages/products?category=${category.toLowerCase()}`} onClick={() => closeMenuButton.current.click()}>
+                      {category}
+                    </Link>
+                  </li>
+                );
+              })
+            }
           </div>
           <li className={styles.sideNavItem}>
             <Link href="/pages/printing" onClick={() => closeMenuButton.current.click()}>
@@ -404,7 +403,7 @@ function Nav2() {
             </Link>
           </li>
           <li className={styles.sideNavItem}>
-            <Link href={user ? "../pages/myaccount" : "../pages/sign"} onClick={() => closeMenuButton.current.click()}>
+            <Link href={user ? "/pages/myaccount" : "/pages/sign"} onClick={() => closeMenuButton.current.click()}>
               <FontAwesomeIcon icon="fa-solid fa-user" /> {user ? "My account" : "Sign in"}
             </Link>
           </li>
