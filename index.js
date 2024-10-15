@@ -187,20 +187,28 @@ app.prepare().then(() => {
 
       newCart.push(cart[0].id);
 
-      await users.updateOne({ _id: userID }, { $set: { cart: newCart } })
+      await users.updateOne({ _id: userID }, { $set: { cart: newCart } });
 
       const newUser = await users.findById(userID);
 
       const product = await products.findById(productID);
 
-      await products.findByIdAndUpdate(productID, { $set: { popularity: product.popularity + 1 } });
+      await products.findByIdAndUpdate(productID, {
+        $set: { popularity: product.popularity + 1 },
+      });
 
       const newProducts = await products.find();
 
       const newCarts = await carts.find();
 
-      return res.json({ success: true, user: newUser, carts: newCarts, products: newProducts });
-    });
+      return res.json({
+        success: true,
+        user: newUser,
+        carts: newCarts,
+        products: newProducts,
+      });
+    }
+  );
 
   server.delete("/api/cartitem/:id", authenticateToken, async (req, res) => {
     const userID = req.user.id;
@@ -217,8 +225,7 @@ app.prepare().then(() => {
         const cart = await carts.findById(cartID);
         productID = cart.product;
         await carts.findByIdAndDelete(item);
-      }
-      else {
+      } else {
         newCart.push(item);
       }
     }
@@ -229,13 +236,20 @@ app.prepare().then(() => {
 
     const product = await products.findById(productID);
 
-    await products.findByIdAndUpdate(productID, { $set: { popularity: product.popularity - 1 } });
+    await products.findByIdAndUpdate(productID, {
+      $set: { popularity: product.popularity - 1 },
+    });
 
     const newProducts = await products.find();
 
     const newCarts = await carts.find();
 
-    return res.json({ success: true, user: newUser, carts: newCarts, products: newProducts });
+    return res.json({
+      success: true,
+      user: newUser,
+      carts: newCarts,
+      products: newProducts,
+    });
   });
 
   server.put(
@@ -257,7 +271,8 @@ app.prepare().then(() => {
   );
 
   server.post("/api/order/:id", async (req, res) => {
-    const { firstName, lastName, address, city, region, notes, shipping } = req.body;
+    const { firstName, lastName, address, city, region, notes, shipping } =
+      req.body;
     const userID = req.params.id;
 
     const user = await users.findById(userID);
@@ -279,25 +294,40 @@ app.prepare().then(() => {
 
     const number = ordersArr.length;
 
-    const order = await orders.insertMany([{
-      orderID: number + 42100,
-      products: productsArr,
-      date: new Date(),
-      total: total,
-      shipping: shipping ? true : false,
-      city: city,
-      region: region,
-      address: address,
-      notes: notes
-    }]);
+    const order = await orders.insertMany([
+      {
+        orderID: number + 42100,
+        products: productsArr,
+        date: new Date(),
+        total: total,
+        shipping: shipping ? true : false,
+        city: city,
+        region: region,
+        address: address,
+        notes: notes,
+      },
+    ]);
 
-    const orderID = order[0]._id
+    const orderID = order[0]._id;
 
     let userOrders = user.orders;
 
     userOrders.push(orderID);
 
-    await users.updateOne({ _id: userID }, { $set: { cart: [], firstname: firstName, lastname: lastName, address: address, city: city, region: region, orders: userOrders } });
+    await users.updateOne(
+      { _id: userID },
+      {
+        $set: {
+          cart: [],
+          firstname: firstName,
+          lastname: lastName,
+          address: address,
+          city: city,
+          region: region,
+          orders: userOrders,
+        },
+      }
+    );
 
     const newUser = await users.findById(userID);
 
@@ -326,7 +356,7 @@ app.prepare().then(() => {
     return res.json({ success: true, user: newUser });
   });
 
-  server.post("/api/addwishlisttocart", async (req, res) => {
+  server.post("/api/wishlist", async (req, res) => {
     let user = req.body;
     let wishlist = user.wishlist;
     let cart100 = [...user.cart];
@@ -335,7 +365,7 @@ app.prepare().then(() => {
         {
           product: id,
           quantity: 1,
-        }
+        },
       ]);
       cart100.push(cart[0]._id);
     }
@@ -346,6 +376,54 @@ app.prepare().then(() => {
     const newUser = await users.findById(user._id);
     const newCarts = await carts.find();
     return res.json({ success: true, user: newUser, carts: newCarts });
+  });
+  server.delete("/api/wishlist", async (req, res) => {
+    let user = req.body;
+    await users.findByIdAndUpdate(user._id, {
+      $set: { wishlist: [] },
+    });
+    return res.json({
+      success: true,
+    });
+  });
+
+  server.post("/api/wishlistsome", async (req, res) => {
+    const { user, selectedItems } = req.body;
+    for (const item of selectedItems) {
+      const cartItem = { product: item._id, quantity: 1 };
+      /* improve */
+      const cartId = await carts.insertMany([cartItem]);
+      user.cart.push(cartId[0]._id);
+      user.wishlist = user.wishlist.filter((id) => id != item._id);
+    }
+    const finalUser = await users.findByIdAndUpdate(user._id, {
+      $set: {
+        cart: user.cart,
+        wishlist: user.wishlist,
+      },
+    });
+    console.log(finalUser);
+    const newCarts = await carts.find();
+    return res.json({
+      success: true,
+      modifiedUser: finalUser,
+      carts: newCarts,
+    });
+  });
+  server.put("/api/edituserdata", authenticateToken, async (req, res) => {
+    const userId = req.user.id;
+    let user = await users.findById(userId);
+    const userData = req.body.userData;
+    let hashedPassword = await bcrypt.hash(userData.newPass, 10);
+    const checkPass = await bcrypt.compare(user.password, hashedPassword);
+    if (!checkPass) {
+      return res.json({ success: false });
+    }
+    user.password = hashedPassword;
+    const newUser = { ...user, ...userData, password: hashedPassword };
+    await users.findByIdAndUpdate(userId, { $set: { ...newUser } });
+    console.log(newUser);
+    return newUser;
   });
   server.get("*", (req, res) => {
     return handle(req, res);

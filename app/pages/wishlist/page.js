@@ -70,12 +70,9 @@ export default function Wishlist() {
   const products = useSelector((state) => state.productsData.data);
   const user = useSelector((state) => state.userData.data);
   const [selectedItems, setSelectedItems] = useState([]);
-  useEffect(
-    () => console.log(selectedItems.map((el) => el._id)),
-    [selectedItems]
-  );
+  const actionRef = useRef(null);
   const handleAddAll = async () => {
-    const res = await fetch("/api/addwishlisttocart", {
+    const res = await fetch("/api/wishlist", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -84,10 +81,48 @@ export default function Wishlist() {
     });
     const data = await res.json();
     if (data.success) {
-      console.log(data.user);
       dispatch(updateUser(data.user));
       dispatch(updateCarts(data.carts));
     }
+  };
+  const handleRemoveAll = async () => {
+    const res = await fetch("/api/wishlist", {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+    const data = await res.json();
+    if (data.success) {
+      dispatch(updateUser({ ...user, wishlist: [] }));
+    }
+  };
+  const handleApply = async () => {
+    let res;
+    if (actionRef.current.value == "add") {
+      res = await fetch("/api/wishlistsome", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ selectedItems: selectedItems, user: user }),
+      });
+    } else {
+      res = await fetch("/api/wishlistsome", {
+        method: "DELETE",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ selectedItems: selectedItems, user: user }),
+      });
+    }
+    const data = await res.json();
+    const modifiedUser = await data.modifiedUser;
+    const carts = await data.carts;
+    console.log(modifiedUser);
+    dispatch(updateUser(modifiedUser));
+    dispatch(updateCarts(carts));
   };
   return (
     <>
@@ -120,15 +155,24 @@ export default function Wishlist() {
 
         <div className={styles.bom}>
           <div className={styles.ri}>
-            <select className={styles.sco} name="cars" id="cars">
-              <option disabled="true">ACTIONS</option>
-              <option value="all">Add to cart</option>
-              <option value="some">Remove</option>
+            <select
+              ref={actionRef}
+              className={styles.sco}
+              name="cars"
+              id="cars"
+            >
+              <option disabled>ACTIONS</option>
+              <option value="add">Add to cart</option>
+              <option value="remove">Remove</option>
             </select>
-            <button className={styles.bot}>Apply</button>
+            <button onClick={handleApply} className={styles.bot}>
+              Apply
+            </button>
           </div>
           <div className={styles.ff}>
-            <button className={styles.bot}>Remove All</button>
+            <button onClick={handleRemoveAll} className={styles.bot}>
+              Remove All
+            </button>
             <button onClick={handleAddAll} className={styles.bot}>
               Add All to Cart
             </button>
