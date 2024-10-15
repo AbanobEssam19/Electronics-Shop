@@ -1,12 +1,17 @@
 const mongoose = require("mongoose");
 
-const Orders = mongoose.model("Orders", {
+const printingOrders = mongoose.model("printingOrders", {
   name: String,
   phone: String,
   grams: Number,
   color: String,
   quality: String,
-  filePath: String,
+  quantaty: String,
+  buildTime: String,
+  finishSurface: Boolean,
+  technology: String,
+  material: String,
+  state:String,
 });
 
-module.exports = Orders;
+module.exports = printingOrders;

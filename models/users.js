@@ -14,7 +14,8 @@ const Users = mongoose.model('Users',
         phone: {type: String, default: ""},
         city: {type: String, default: ""},
         region: {type: String, default: ""},
-        orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Orders' , default: []}]
+        orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Orders' , default: []}],
+        printingOrders:[{ type: mongoose.Schema.Types.ObjectId, ref: 'printingOrders' , default: []}]
     }
 )
 
