@@ -457,22 +457,36 @@ app.prepare().then(() => {
     const userId = req.user.id;
     console.log("User ID:", userId);
     let user = await users.findById(userId);
-    const userData = req.body.userData;
+    console.log("User: ", user);
+    const userData = req.body;
     console.log("userData from front: ", userData);
-    let hashedPassword = await bcrypt.hash(userData.newPass, 10);
-    const checkPass = await bcrypt.compare(user.password, hashedPassword);
+
+    const checkPass = await bcrypt.compare(userData.curPass, user.password);
     if (!checkPass) {
-      return res.json({ success: false });
+      return res.json({
+        success: false,
+        message: "Incorrect current password",
+      });
     }
-    user.password = hashedPassword;
-    const newUser = { ...user, ...userData, password: hashedPassword };
-    await users.findByIdAndUpdate(
+
+    let hashedPassword = user.password;
+    if (userData.newPass) {
+      hashedPassword = await bcrypt.hash(userData.newPass, 10);
+    }
+
+    const newUser = {
+      ...user.toObject(),
+      ...userData,
+      password: hashedPassword,
+    };
+
+    const updatedUser = await users.findByIdAndUpdate(
       userId,
       { $set: { ...newUser } },
       { new: true }
     );
-    console.log(newUser);
-    return newUser;
+
+    return res.json({ success: true, user: updatedUser });
   });
 
   server.get("*", (req, res) => {

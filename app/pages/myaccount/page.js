@@ -2,11 +2,13 @@
 import MyaccountSidebar from "@/app/components/MyaccountSidebar/sidebar";
 
 import styles from "./page.module.css";
-import { useSelector } from "react-redux";
 import Error from "../Error/page";
 import { useEffect, useState } from "react";
+import { updateUser } from "@/app/states/reducers/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function AccountDetails() {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.userData.data);
   const [userData, setUserData] = useState({
     firstname: "",
@@ -26,45 +28,65 @@ export default function AccountDetails() {
     });
   }
   useEffect(() => {
-    if (!user) return;
+    if (!user) return; // Ensure user is defined
+    console.log("User data loaded:", user);
     setUserData({
-      firstname: user.firstname,
-      lastname: user.lastname,
-      address: user.address,
-      city: user.city,
-      region: user.region,
+      firstname: user.firstname || "",
+      lastname: user.lastname || "",
+      address: user.address || "",
+      city: user.city || "",
+      region: user.region || "",
     });
   }, [user]);
+
   if (!user) {
     return <Error />;
   }
   console.log(user);
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&#]{8,}$/;
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!userData.curPass) return;
     if (userData.newPass) {
       if (!passwordRegex.test(userData.newPass)) {
+        console.error("Invalid password format.");
         return;
       }
-      if (userData.newPass != userData.confirmPass) {
+      if (userData.newPass !== userData.confirmPass) {
+        console.error("Passwords do not match.");
         return;
       }
     }
-    let token = localStorage.getItem("token");
 
-    if (!token) token = sessionStorage.getItem("token");
-    const res = fetch("/api/edituserdata", {
-      method: "PUT",
-      headers: {
-        "content-type": "application/json",
-        token: `${token}`,
-      },
-      body: JSON.stringify(userData),
-    });
-    const data = res.json();
-    console.log(data);
+    let token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/edituserdata", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          token: `${token}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to update user data.");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Response data:", data);
+    } catch (error) {
+      console.error("Error during fetch:", error);
+    }
   };
+
   return (
     <div
       className={`container ${styles.AccountDetails}`}
@@ -76,7 +98,7 @@ export default function AccountDetails() {
         <input
           id="firstname"
           type="text"
-          value={userData.firstName}
+          value={userData.firstname}
           onChange={updateData}
         />{" "}
         <br />
@@ -84,7 +106,7 @@ export default function AccountDetails() {
         <input
           id="lastname"
           type="text"
-          value={userData.lastName}
+          value={userData.lastname}
           onChange={updateData}
         />{" "}
         <br />
@@ -137,15 +159,13 @@ export default function AccountDetails() {
           id="confirmPass"
           type="password"
           value={userData.confirmPass}
+          onChange={updateData}
         />{" "}
         <br />
-        <input
-          type="submit"
-          value="Save Changes"
-          onClick={handleSubmit}
-          className={styles.sumbit}
-        />
       </form>
+      <button onClick={handleSubmit} className={styles.sumbit}>
+        Save Changes
+      </button>
     </div>
   );
 }
