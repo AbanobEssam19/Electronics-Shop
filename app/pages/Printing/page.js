@@ -1,6 +1,8 @@
 "use client";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "./3d.module.css";
 import { useState } from "react";
+import { updateUser } from "@/app/states/reducers/userSlice";
 
 const materials = [
   "LEDO 6060 Resin",
@@ -24,6 +26,8 @@ const technologies = [
 ];
 
 const Printing = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.userData.data);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [grams, setGrams] = useState("");
@@ -35,36 +39,46 @@ const Printing = () => {
   const [selectedTechnology, setSelectedTechnology] = useState("");
   const [surfaceFinish, setSurfaceFinish] = useState(false);
   const [buildTime, setBuildTime] = useState("48 hours");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log({
+    if (
+      name == "" ||
+      phone == "" ||
+      grams == "" ||
+      color == "" ||
+      quality == "" ||
+      // file == null ||
+      selectedMaterial == "" ||
+      selectedTechnology == "" ||
+      quantity == ""
+    )
+      return;
+    const orderData = {
       name,
       phone,
       grams,
       color,
       quality,
-      file,
       selectedMaterial,
       selectedTechnology,
       surfaceFinish,
       buildTime,
       quantity,
+    };
+    const res = await fetch(`/api/printingorder/${user._id}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(orderData),
     });
-
-    setName("");
-    setPhone("");
-    setGrams("");
-    setColor("");
-    setQuality("");
-    setFile(null);
-    setSelectedMaterial("");
-    setSelectedTechnology("");
-    setSurfaceFinish(false);
-    setBuildTime("48 hours");
-    setQuantity(1);
+    const data = await res.json();
+    if (data.success) {
+      dispatch(updateUser(data.user));
+      window.location.href = "/pages/myaccount/orders";
+    }
   };
 
   return (
@@ -217,7 +231,6 @@ const Printing = () => {
             className={styles.inputfield}
             accept=".stl"
             onChange={(e) => setFile(e.target.files[0])}
-            required
           />
         </div>
         <button type="submit" className={styles.submitbutton}>
