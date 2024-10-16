@@ -104,6 +104,43 @@ export default function Product() {
     }
   }
 
+  const [inWishList, setInWishList] = useState(false);
+
+  useEffect(() => {
+    setInWishList(false);
+    user && product && user.wishlist.map((id) => {
+      if (id == product._id) {
+        setInWishList(true);
+        return;
+      }
+    });
+  }, [user, product]);
+
+  const wishListHandler = async () => {
+    if (!user) {
+      const alert = document.getElementById("alertContainer");
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
+      return;
+    }
+    const res = await fetch(`/api/addtowishlist/${product._id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setInWishList(!inWishList);
+      dispatch(updateUser(data.user));
+    } 
+  };
+
   if (!product) {
     return <Error />;
   }
@@ -144,9 +181,9 @@ export default function Product() {
                 <button onClick={increaseAmount} disabled={product.quantity == 0 || inCart}>+</button>
               </div>
               <button disabled={product.quantity == 0 || inCart} onClick={addItem} >{inCart ? "In" : "Add to"} cart</button>
-              <button>
-                <FontAwesomeIcon icon="fa-regular fa-heart" />
-                <p>Add to wishlist</p>
+              <button onClick={wishListHandler}>
+                <FontAwesomeIcon icon={`fa-${inWishList ?  "solid" : "regular"} fa-heart`} style={inWishList ? { color: "red" } : {}} />
+                <p>{inWishList ? "Remove from" : `Add to`} wishlist</p>
               </button>
             </div>
             <div className={styles.cartAmount}>

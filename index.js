@@ -468,7 +468,6 @@ app.prepare().then(() => {
       newWishlist = newWishlist.filter((id) => id != item._id);
       user.wishlist = newWishlist;
     }
-    console.log("user is: ", user);
     const userID = await user._id;
     const wishList100 = await user.wishlist;
     const finalUser = await users.findByIdAndUpdate(
@@ -478,8 +477,6 @@ app.prepare().then(() => {
       },
       { new: true }
     );
-    console.log("wishlist100 is:", wishList100);
-    console.log("final User is: ", finalUser);
     return res.json({
       success: true,
       modifiedUser: finalUser,
@@ -488,11 +485,8 @@ app.prepare().then(() => {
 
   server.put("/api/edituserdata", authenticateToken, async (req, res) => {
     const userId = req.user.id;
-    console.log("User ID:", userId);
     let user = await users.findById(userId);
-    console.log("User: ", user);
     const userData = req.body;
-    console.log("userData from front: ", userData);
 
     const checkPass = await bcrypt.compare(userData.curPass, user.password);
     if (!checkPass) {

@@ -19,7 +19,7 @@ export default function Modal() {
   const products = useSelector((state) => state.productsData.data);
 
   const dispatch = useDispatch();
-  
+
   const closeBtn = useRef(null);
 
   const [amount, setAmount] = useState();
@@ -36,7 +36,7 @@ export default function Modal() {
     setAmount(amountRef.current.value);
   }
 
-  async function addItem(){
+  async function addItem() {
     let token = localStorage.getItem('token');
 
     if (!token)
@@ -90,6 +90,43 @@ export default function Modal() {
     });
   }, [user, product]);
 
+  const [inWishList, setInWishList] = useState(false);
+
+  useEffect(() => {
+    setInWishList(false);
+    user && product && user.wishlist.map((id) => {
+      if (id == product._id) {
+        setInWishList(true);
+        return;
+      }
+    });
+  }, [user, product]);
+
+  const wishListHandler = async () => {
+    if (!user) {
+      const alert = document.getElementById("alertContainer");
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
+      return;
+    }
+    const res = await fetch(`/api/addtowishlist/${product._id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setInWishList(!inWishList);
+      dispatch(updateUser(data.user));
+    } 
+  };
+
   return (
     <div
       className="modal fade"
@@ -133,7 +170,7 @@ export default function Modal() {
               <div className={styles.state} style={product && product.quantity > 0 ? {} : { backgroundColor: "#ff00000a" }}>
                 <FontAwesomeIcon
                   icon={`fa-regular fa-circle-${product && product.quantity > 0 ? "check" : "xmark"}`}
-                  style={product && product.quantity > 0 ? { color: "#54ca87" } : {color: "red"}}
+                  style={product && product.quantity > 0 ? { color: "#54ca87" } : { color: "red" }}
                 />
                 <p style={product && product.quantity > 0 ? {} : { color: "red" }}>{product && product.quantity > 0 ? "In" : "Out of"} Stock</p>
               </div>
@@ -143,23 +180,23 @@ export default function Modal() {
               </div>
               <div className={styles.buttonsBox}>
                 <div className={styles.amountContainer}>
-                <button onClick={decreaseAmount} disabled={(product && product.quantity == 0) || inCart}>-</button>
-                <input
-                  type="number"
-                  value={amount}
-                  ref={amountRef}
-                  onChange={(e) => {
-                    if (e.target.value === "") e.target.value = 1;
-                    setAmount(e.target.value);
-                  }}
-                  disabled={(product && product.quantity == 0) || inCart}
-                />
-                <button onClick={increaseAmount} disabled={(product && product.quantity == 0) || inCart}>+</button>
+                  <button onClick={decreaseAmount} disabled={(product && product.quantity == 0) || inCart}>-</button>
+                  <input
+                    type="number"
+                    value={amount}
+                    ref={amountRef}
+                    onChange={(e) => {
+                      if (e.target.value === "") e.target.value = 1;
+                      setAmount(e.target.value);
+                    }}
+                    disabled={(product && product.quantity == 0) || inCart}
+                  />
+                  <button onClick={increaseAmount} disabled={(product && product.quantity == 0) || inCart}>+</button>
                 </div>
                 <button disabled={(product && product.quantity == 0) || inCart} onClick={addItem} >{inCart ? "In" : "Add to"} cart</button>
-                <button>
-                  <FontAwesomeIcon icon="fa-regular fa-heart" />
-                  <p>Add to wishlist</p>
+                <button onClick={wishListHandler}>
+                  <FontAwesomeIcon icon={`fa-${inWishList ? "solid" : "regular"} fa-heart`} style={inWishList ? { color: "red" } : {}} />
+                  <p>{inWishList ? "Remove from" : `Add to`} wishlist</p>
                 </button>
               </div>
               <div className={styles.cartAmount}>

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCarts } from "@/app/states/reducers/cartsSlice";
 import Error from "../Error/page";
+import EmptyWishlist from "../EmptyWishlist/page";
 
 function WishlistItem({ id, selectedItems, setSelectedItems }) {
   const products = useSelector((state) => state.productsData.data);
@@ -131,8 +132,12 @@ export default function Wishlist() {
     }
   };
 
-  if (!user || user.wishlist.length == 0) {
+  if (!user) {
     return <Error />;
+  }
+
+  if (user.wishlist.length == 0) {
+    return <EmptyWishlist />;
   }
 
   return (

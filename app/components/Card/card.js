@@ -132,8 +132,8 @@ export default function Card({ product }) {
           <button className={styles.wishList} onClick={wishListHandler}>
             <FontAwesomeIcon
               ref={heartIconRef}
-              icon="fa-regular fa-heart"
-              style={{ width: "35px", height: "14px", color: "black" }}
+              icon={`fa-${inWishList ?  "solid" : "regular"} fa-heart`}
+              style={{ width: "35px", height: "14px" }}
             />
           </button>
         </div>

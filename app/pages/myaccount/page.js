@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { updateUser } from "@/app/states/reducers/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+import alertStyles from "@/app/components/Alerts/alerts.module.css";
+
 export default function AccountDetails() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userData.data);
@@ -20,6 +22,7 @@ export default function AccountDetails() {
     newPass: "",
     confirmPass: "",
   });
+
   function updateData(e) {
     const { id, value } = e.target;
     setUserData({
@@ -27,43 +30,59 @@ export default function AccountDetails() {
       [id]: value,
     });
   }
+
   useEffect(() => {
-    if (!user) return; // Ensure user is defined
-    console.log("User data loaded:", user);
+    if (!user) return;
     setUserData({
       firstname: user.firstname || "",
       lastname: user.lastname || "",
       address: user.address || "",
       city: user.city || "",
       region: user.region || "",
+      curPass: "",
+      newPass: "",
+      confirmPass: ""
     });
   }, [user]);
 
-  if (!user) {
-    return <Error />;
-  }
-  console.log(user);
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&#]{8,}$/;
+
   const handleSubmit = async () => {
-    if (!userData.curPass) return;
+    const alert = document.getElementById("alertContainer");
+
+    if (!userData.curPass) {
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          Please enter your current password.
+        </div>
+      `;
+      return;
+    }
     if (userData.newPass) {
       if (!passwordRegex.test(userData.newPass)) {
-        console.error("Invalid password format.");
+        alert.innerHTML = `
+          <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
+          </div>
+        `;
         return;
       }
       if (userData.newPass !== userData.confirmPass) {
-        console.error("Passwords do not match.");
+        alert.innerHTML = `
+          <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            Passwords do not match.
+          </div>
+        `;
         return;
       }
     }
 
     let token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
 
     try {
       const res = await fetch("/api/edituserdata", {
@@ -75,17 +94,35 @@ export default function AccountDetails() {
         body: JSON.stringify(userData),
       });
 
-      if (!res.ok) {
-        console.error("Failed to update user data.");
+      const data = await res.json();
+
+      if (!data.success) {
+        alert.innerHTML = `
+          <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            Entered current password is incorrect.
+          </div>
+        `;
         return;
       }
 
-      const data = await res.json();
-      console.log("Response data:", data);
+      
+      dispatch(updateUser(data.user));
+
+      alert.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          User data updated successfully.
+        </div>
+      `;
     } catch (error) {
       console.error("Error during fetch:", error);
     }
   };
+
+  if (!user) {
+    return <Error />;
+  }
 
   return (
     <div
@@ -93,7 +130,7 @@ export default function AccountDetails() {
       style={{ minHeight: "500px" }}
     >
       <MyaccountSidebar num={1} />
-      <form action="">
+      <div className={styles.form}>
         <label>First name</label>
         <input
           id="firstname"
@@ -162,10 +199,11 @@ export default function AccountDetails() {
           onChange={updateData}
         />{" "}
         <br />
-      </form>
-      <button onClick={handleSubmit} className={styles.sumbit}>
-        Save Changes
-      </button>
+        <button onClick={handleSubmit} className={styles.sumbit}>
+          Save Changes
+        </button>
+      </div>
+      
     </div>
   );
 }

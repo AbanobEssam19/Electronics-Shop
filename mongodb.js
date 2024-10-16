@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const users = require("./models/users");
 
 mongoose
   .connect(process.env.MONGO_URI)
