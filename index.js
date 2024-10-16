@@ -368,8 +368,6 @@ app.prepare().then(() => {
     return res.json({ success: true, user: updateuser });
   });
 
-
-
   server.post("/api/wishlist", async (req, res) => {
     let user = req.body;
     let wishlist = user.wishlist;
@@ -391,7 +389,7 @@ app.prepare().then(() => {
     const newCarts = await carts.find();
     return res.json({ success: true, user: newUser, carts: newCarts });
   });
-  
+
   server.delete("/api/wishlist", async (req, res) => {
     let user = req.body;
     await users.findByIdAndUpdate(user._id, {
@@ -411,13 +409,16 @@ app.prepare().then(() => {
       user.cart.push(cartId[0]._id);
       user.wishlist = user.wishlist.filter((id) => id != item._id);
     }
-    const finalUser = await users.findByIdAndUpdate(user._id, {
-      $set: {
-        cart: user.cart,
-        wishlist: user.wishlist,
+    const finalUser = await users.findByIdAndUpdate(
+      user._id,
+      {
+        $set: {
+          cart: user.cart,
+          wishlist: user.wishlist,
+        },
       },
-    });
-    console.log(finalUser);
+      { new: true }
+    );
     const newCarts = await carts.find();
     return res.json({
       success: true,
@@ -425,10 +426,39 @@ app.prepare().then(() => {
       carts: newCarts,
     });
   });
+
+  server.delete("/api/wishlistsome", async (req, res) => {
+    let { user, selectedItems } = req.body;
+    for (const item of selectedItems) {
+      /* improve */
+      let newWishlist = user.wishlist;
+      newWishlist = newWishlist.filter((id) => id != item._id);
+      user.wishlist = newWishlist;
+    }
+    console.log("user is: ", user);
+    const userID = await user._id;
+    const wishList100 = await user.wishlist;
+    const finalUser = await users.findByIdAndUpdate(
+      userID,
+      {
+        $set: { wishlist: wishList100 },
+      },
+      { new: true }
+    );
+    console.log("wishlist100 is:", wishList100);
+    console.log("final User is: ", finalUser);
+    return res.json({
+      success: true,
+      modifiedUser: finalUser,
+    });
+  });
+
   server.put("/api/edituserdata", authenticateToken, async (req, res) => {
     const userId = req.user.id;
+    console.log("User ID:", userId);
     let user = await users.findById(userId);
     const userData = req.body.userData;
+    console.log("userData from front: ", userData);
     let hashedPassword = await bcrypt.hash(userData.newPass, 10);
     const checkPass = await bcrypt.compare(user.password, hashedPassword);
     if (!checkPass) {
@@ -436,7 +466,11 @@ app.prepare().then(() => {
     }
     user.password = hashedPassword;
     const newUser = { ...user, ...userData, password: hashedPassword };
-    await users.findByIdAndUpdate(userId, { $set: { ...newUser } });
+    await users.findByIdAndUpdate(
+      userId,
+      { $set: { ...newUser } },
+      { new: true }
+    );
     console.log(newUser);
     return newUser;
   });

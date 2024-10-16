@@ -118,11 +118,15 @@ export default function Wishlist() {
       });
     }
     const data = await res.json();
-    const modifiedUser = await data.modifiedUser;
-    const carts = await data.carts;
-    console.log(modifiedUser);
-    dispatch(updateUser(modifiedUser));
-    dispatch(updateCarts(carts));
+    if (data.success) {
+      const modifiedUser = await data.modifiedUser;
+      console.log(modifiedUser);
+      dispatch(updateUser({ ...user, ...modifiedUser }));
+      if (actionRef.current.value == "add") {
+        const carts = await data.carts;
+        dispatch(updateCarts(carts));
+      }
+    }
   };
   return (
     <>
