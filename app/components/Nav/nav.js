@@ -9,6 +9,8 @@ import { fetchUser, fetchProducts, fetchCarts } from "@/app/states/APIs/apis";
 import { updateUser } from "@/app/states/reducers/userSlice";
 import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
+import alertStyles from "@/app/components/Alerts/alerts.module.css";
+
 function CartItem({ product, cart }) {
   const dispatch = useDispatch();
 
@@ -112,29 +114,31 @@ function Nav1() {
     dispatch(fetchCarts());
   }, []);
 
-  const total = useMemo(() => {
-    if (!user || !carts || !products) return 0;
-
-    let newTotal = 0;
-    user.cart.forEach((id) => {
-      const details = carts.find((cart) => cart._id === id);
-      if (details) {
-        const product = products.find((product) => product._id === details.product);
-        if (product) {
-          newTotal += product.price * details.quantity;
-        }
-      }
-    });
-
-    return newTotal;
-  }, [user]);
-
   const cartButton = useRef(null);
   const closeCartButton = useRef(null);
 
+  const [alert, setAlert] = useState(null);
+
+  useEffect(() => {
+    const alert = document.getElementById("alertContainer");
+    setAlert(alert);
+  }, [])
+
+  function showError() {
+    alert.innerHTML = `
+      <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        You need to login first!
+      </div>
+    `;
+  }
+
   function checkUser() {
     if (user == null) {
-
+      showError();
+    }
+    else if (window.location.pathname == "/pages/checkout" || window.location.pathname == "/pages/cart") {
+      window.location.href = "/pages/cart";
     }
     else {
       cartButton.current.click();
@@ -181,6 +185,7 @@ function Nav1() {
       </Link>
 
       <Link
+        onClick={() => !user && showError()}
         href="/pages/wishlist"
         className={`${styles.navBtns} ${styles.wishlist}`}
         title="Wishlist"
@@ -235,7 +240,7 @@ function Nav1() {
           <div className={styles.cartFooter}>
             <div className={styles.total}>
               <p>TOTAL:</p>
-              <p>{total}.00 EGP</p>
+              <p>{user && user.total}.00 EGP</p>
             </div>
             <div className={styles.footerLinks}>
               <Link href="/pages/cart" onClick={() => closeCartButton.current.click()} >VIEW CART</Link>
@@ -259,6 +264,8 @@ function Nav2() {
 
   const [categories, setCategories] = useState(null);
 
+  const [alert, setAlert] = useState(null);
+
   useEffect(() => {
     let set = new Set();
 
@@ -272,6 +279,31 @@ function Nav2() {
 
     setCategories([...set]);
   }, [products]);
+
+  const cartButton = useRef(null);
+
+  useEffect(() => {
+    const alert = document.getElementById("alertContainer");
+    setAlert(alert);
+  }, [])
+
+  function showError() {
+    alert.innerHTML = `
+      <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        You need to login first!
+      </div>
+    `;
+  }
+
+  function checkUser() {
+    if (user == null) {
+      showError();
+    }
+    else {
+      cartButton.current.click();
+    }
+  }
 
   return (
     <div className={`container-fluid ${styles.nav2}`}>
@@ -330,9 +362,11 @@ function Nav2() {
           </Link>
         </div>
 
-        <button className={styles.navBtns}
+        <button
           data-bs-toggle="offcanvas"
-          data-bs-target="#cartSideBar">
+          data-bs-target="#cartSideBar" style={{ display: "none" }} ref={cartButton}></button>
+
+        <button className={styles.navBtns} onClick={checkUser}>
           <FontAwesomeIcon
             icon="fa-solid fa-cart-shopping"
             style={{ width: "40px", height: "30px" }}

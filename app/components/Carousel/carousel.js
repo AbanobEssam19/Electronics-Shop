@@ -7,33 +7,12 @@ function Carousel({ product }) {
       className={`carousel slide ${styles.parentCarousel}`}
       data-bs-ride="carousel"
     >
-      <div className="carousel-indicators">
-        <button
-          type="button"
-          data-bs-target="#mainCarousel"
-          data-bs-slide-to="0"
-          className="active"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#mainCarousel"
-          data-bs-slide-to="1"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#mainCarousel"
-          data-bs-slide-to="2"
-        ></button>
-      </div>
-
       <div className={`carousel-inner ${styles.carouselInner}`}>
-        {product.photo.map((photo) => (
-          <>
-            <div className={`carousel-item active ${styles.carouselItem}`}>
-              <img src={photo} className="d-block w-100" />
-            </div>
-          </>
-        ))}
+        {product.photo.map((photo, index) => {
+          return <div key={index} className={`carousel-item ${index == 0 && "active"} ${styles.carouselItem}`}>
+            <img src={photo} className="d-block w-100" />
+          </div>;
+        })}
       </div>
 
       <button

@@ -121,3 +121,24 @@
         width: 40%;
     }
 }
+
+@media (max-width: 490px) {
+    .stockStatus {
+        display: none;
+    }
+
+    .state, .state2 {
+        width: auto;
+        height: auto;
+    }
+}
+
+@media (max-width: 444px) {
+    .tableHeadPhoto, .productImg {
+        display: none;
+    }
+
+    .main, .main button {
+        font-size: small;
+    }
+}

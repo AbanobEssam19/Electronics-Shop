@@ -6,16 +6,16 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Error from "../../Error/page";
 
-function OrderDetails ({order}) {
+function OrderDetails ({order, printing}) {
     if (!order)
-        return <div>Error 404</div>;
+        return <div>Loading...</div>;
     const date = new Date(order.date);
     return (
         <div className= {styles.OrderDetails}>
             <p style = {{color: "red"}}>#{order.orderID}</p>
             <p style = {{color: "grey"}}>{date.toLocaleDateString()}</p>
             <p style = {{color: "grey"}}>{order.status}</p>
-            <p style = {{color: "black"}}>{order.total} EGP</p>
+            <p style = {{color: "black"}}>{order.total} {!printing && "EGP"}</p>
         </div>
     )
 }
@@ -23,21 +23,13 @@ function OrderDetails ({order}) {
 
 export default function Orders () {
     const [orders, setOrders] = useState(null);
+    const [printingOrders, setPrintingOrders] = useState(null);
     const user = useSelector((state) => state.userData.data);
 
     useEffect(() => {
 
         async function getOrders() {
-            let token = localStorage.getItem('token');
-
-            if (!token)
-                token = sessionStorage.getItem('token');
-
-            const res = await fetch('/api/orders', {
-                headers: {
-                    'token': `${token}`
-                }
-            });
+            const res = await fetch('/api/orders');
 
             const data = await res.json();
 
@@ -45,9 +37,20 @@ export default function Orders () {
         }
 
         getOrders();
+
+        async function getPrintingOrders() {
+            const res = await fetch('/api/printingorders'); 
+
+            const data = await res.json();
+
+            setPrintingOrders(data.orders);
+            console.log(data.orders);
+        }
+
+        getPrintingOrders();
     }, []);
 
-    if (!user || !orders) {
+    if (!user || !orders || !printingOrders) {
         return <Error />;
     }
 
@@ -64,7 +67,13 @@ export default function Orders () {
                 {
                     user.orders.map((id) => {
                         const order = orders.find((order) => order._id === id);
-                        return <OrderDetails key={order._id} order={order} />;
+                        return <OrderDetails key={order._id} order={order} printing={false} />;
+                    })
+                }
+                {
+                    user.printingOrders.map((id) => {
+                        const order = printingOrders.find((order) => order._id === id);
+                        return <OrderDetails key={order._id} order={order} printing={true} />;
                     })
                 }
             </div>

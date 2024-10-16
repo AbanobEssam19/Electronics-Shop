@@ -47,7 +47,7 @@ export default function Contact() {
                             <div className={styles["inner-column"]}>
                                 <h2>Contact Info</h2>
                                 <ul className={styles["list-info"]}>
-                                    <li><FontAwesomeIcon icon="fas fa-globe" />132 Shobra street - Cairo - Egypt.</li>
+                                    <li><FontAwesomeIcon icon="fas fa-globe" />El-Abbasiya Street El Weili, Cairo - Egypt.</li>
                                     <li><FontAwesomeIcon icon="far fa-envelope" />example@test</li>
                                     <li>
                                         <FontAwesomeIcon icon="fas fa-phone" />1-234-567-890 <br />

@@ -1,8 +1,10 @@
 "use client";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./3d.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateUser } from "@/app/states/reducers/userSlice";
+
+import alertStyles from "@/app/components/Alerts/alerts.module.css";
 
 const materials = [
   "LEDO 6060 Resin",
@@ -41,20 +43,26 @@ const Printing = () => {
   const [buildTime, setBuildTime] = useState("48 hours");
   const [quantity, setQuantity] = useState();
 
+  useEffect(() => {
+    if (user) {
+      setPhone(user.phone);
+    }
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      name == "" ||
-      phone == "" ||
-      grams == "" ||
-      color == "" ||
-      quality == "" ||
-      // file == null ||
-      selectedMaterial == "" ||
-      selectedTechnology == "" ||
-      quantity == ""
-    )
+    
+    if (!user) {
+      const alert = document.getElementById("alertContainer");
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
       return;
+    }
+
     const orderData = {
       name,
       phone,
@@ -65,7 +73,7 @@ const Printing = () => {
       selectedTechnology,
       surfaceFinish,
       buildTime,
-      quantity,
+      quantity
     };
     const res = await fetch(`/api/printingorder/${user._id}`, {
       method: "POST",

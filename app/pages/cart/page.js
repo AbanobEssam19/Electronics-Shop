@@ -8,11 +8,11 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "@/app/states/reducers/userSlice";
 import { updateCarts } from "@/app/states/reducers/cartsSlice";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import EmptyCart from "../EmptyCart/page";
 import Error from "../Error/page";
 
-function CartItem({ product, cart }) {
+function CartItem({ product, cart, clearCoupon }) {
 
 
     const dispatch = useDispatch();
@@ -35,6 +35,8 @@ function CartItem({ product, cart }) {
             dispatch(updateUser(data.user));
             dispatch(updateCarts(data.carts));
         }
+
+        clearCoupon();
     }
 
     const [itemQuantity, setItemQuantity] = useState(cart.quantity);
@@ -73,6 +75,8 @@ function CartItem({ product, cart }) {
             quantityInput.current.value = quantity;
             setItemQuantity(quantity);
         }
+
+        clearCoupon();
     }
 
     return (
@@ -106,6 +110,18 @@ export default function ShoppingCart() {
     const carts = useSelector((state) => state.cartsData.data);
     const products = useSelector((state) => state.productsData.data);
 
+    const [coupons, setCoupons] = useState(null);
+
+    useEffect(() => {
+        async function getCoupons() {
+            const res = await fetch("/api/coupons");
+            const data = await res.json();
+            setCoupons(data.coupons);
+        }
+
+        getCoupons();
+    }, []);
+
     const shippingText = useRef();
 
     const [shipping, setShipping] = useState(true);
@@ -122,22 +138,54 @@ export default function ShoppingCart() {
         }
     }
 
-    const total = useMemo(() => {
-        if (!user || !carts || !products) return 0;
+    const [coupon, setCoupon] = useState("");
 
-        let newTotal = 0;
-        user.cart.forEach((id) => {
-            const details = carts.find((cart) => cart._id === id);
-            if (details) {
-                const product = products.find((product) => product._id === details.product);
-                if (product) {
-                    newTotal += product.price * details.quantity;
+    const [couponItem, setCouponItem] = useState(null);
+
+    const couponText = useRef(null);
+
+    function clearCoupon() {
+        setCoupon("");
+        setCouponItem(null);
+        couponText.current.innerText = "";
+    }
+
+    function checkCoupon() {
+        if (coupon == "") {
+            return;
+        }
+        setCouponItem(null);
+        couponText.current.innerText = "Coupon not found";
+        couponText.current.style.color = "red";
+        coupons.map((item) => {
+            if (item.code == coupon) {
+                if (new Date(item.expiryDate) <= new Date()) {
+                    couponText.current.innerText = "Coupon expired";
+                    return;
                 }
+                
+                if (item.minPurchase > user.total) {
+                    couponText.current.innerText = `Coupon applies to ${item.minPurchase} EGP or more`;
+                    return;
+                }
+
+                if (item.newUser && user.orders.length > 0) {
+                    couponText.current.innerText = "Coupon applies to new users only";
+                    return;
+                }
+                
+                if (user.usedCoupons.includes(item._id)) {
+                    couponText.current.innerText = "Coupon applied before";
+                    return;
+                }
+                
+                setCouponItem(item);
+                couponText.current.innerText = "Coupon applied successfully";
+                couponText.current.style.color = "green";
+                return;
             }
         });
-
-        return newTotal;
-    }, [user]);
+    }
 
     if (!user) {
         return <Error />;
@@ -150,31 +198,38 @@ export default function ShoppingCart() {
     return (
         <div className={`container ${styles.main}`} >
             <div className={styles.content} >
-                <table className={styles.products} >
-                    <thead>
-                        <tr>
-                            <th style={{ width: "50%" }} >PRODUCT</th>
-                            <th style={{ width: "15%" }} >UNIT PRICE</th>
-                            <th style={{ width: "15%" }} >QUANTITY</th>
-                            <th style={{ width: "15%" }} >SUBTOTAL</th>
-                            <th style={{ width: "5%" }} ></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            user && products && carts && user.cart.map((id) => {
-                                const cart = carts.find((item) => item._id == id);
-                                const product = products.find((item) => item._id == cart.product);
-                                return <CartItem key={id} product={product} cart={cart} />;
-                            })
-                        }
-                    </tbody>
-                </table>
+                <div className={styles.products} >
+                    <table >
+                        <thead>
+                            <tr>
+                                <th style={{ width: "50%" }} >PRODUCT</th>
+                                <th style={{ width: "15%" }} >UNIT PRICE</th>
+                                <th style={{ width: "15%" }} >QUANTITY</th>
+                                <th style={{ width: "15%" }} >SUBTOTAL</th>
+                                <th style={{ width: "5%" }} ></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                user && products && carts && user.cart.map((id) => {
+                                    const cart = carts.find((item) => item._id == id);
+                                    const product = products.find((item) => item._id == cart.product);
+                                    return <CartItem key={id} product={product} cart={cart} clearCoupon={clearCoupon} />;
+                                })
+                            }
+                        </tbody>
+                    </table>
+                    <div className={styles.couponSection}>
+                        <input type="text" placeholder="Coupon code" value={coupon} onChange={(e) => {setCoupon(e.target.value)}} />
+                        <button onClick={checkCoupon}>Apply</button>
+                    </div>
+                    <p className={styles.couponText} ref={couponText}></p>
+                </div>
                 <div className={styles.totalSection}>
                     <p>CART TOTAL</p>
                     <div className={styles.section}>
                         <strong>Subtotal</strong>
-                        <p>{total}.00 EGP</p>
+                        <p>{user.total}.00 EGP</p>
                     </div>
                     <div className={`${styles.shippingOptions} ${styles.section}`} >
                         <strong>Shipping</strong>
@@ -190,11 +245,15 @@ export default function ShoppingCart() {
                             <p ref={shippingText}>Shipping price will be added during checkout</p>
                         </div>
                     </div>
+                    <div className={styles.discountSection}>
+                        <strong>Discount</strong>
+                        <p>{couponItem ? -couponItem.discount : 0}.00 EGP</p>
+                    </div>
                     <div className={styles.section} >
                         <strong>Total</strong>
-                        <p>{total}.00 EGP</p>
+                        <p>{couponItem ? user.total - couponItem.discount : user.total}.00 EGP</p>
                     </div>
-                    <Link href={`/pages/checkout?shipping=${shipping}`} >Proceed to checkout</Link>
+                    <Link href={`/pages/checkout?shipping=${shipping}&coupon=${couponItem ? couponItem._id : ""}`} >Proceed to checkout</Link>
                 </div>
             </div>
         </div>

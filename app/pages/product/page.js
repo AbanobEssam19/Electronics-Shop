@@ -9,10 +9,17 @@ import Card from "@/app/components/Card/card";
 
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "@/app/states/reducers/userSlice";
+import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
-export default function Main() {
-  const productId = useSearchParams().get("id");
+import Error from "../Error/page";
+
+import alertStyles from "@/app/components/Alerts/alerts.module.css";
+
+export default function Product() {
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("id");
 
   const products = useSelector((state) => state.productsData.data);
 
@@ -23,22 +30,82 @@ export default function Main() {
       const foundProduct = products.find((product) => product._id == productId);
       setProduct(foundProduct);
     }
-  }, [productId]);
+  }, [productId, products]);
 
   const [amount, setAmount] = useState(1);
   const amountRef = useRef();
 
   function increaseAmount() {
     amountRef.current.value = parseInt(amountRef.current.value) + 1;
+    setAmount(amountRef.current.value);
   }
 
   function decreaseAmount() {
     if (amountRef.current.value > 1)
       amountRef.current.value = amountRef.current.value - 1;
+    setAmount(amountRef.current.value);
+  }
+  const user = useSelector((state) => state.userData.data);
+  const carts = useSelector((state) => state.cartsData.data);
+
+  const [inCart, setInCart] = useState(false);
+
+  useEffect(() => {
+    setInCart(false);
+    setAmount(1);
+    user && carts && products && product && user.cart.map((id) => {
+      const details = carts.find((item) => item._id == id);
+      const check = products.find((item) => item._id == details.product);
+      if (check._id == product._id) {
+        setInCart(true);
+        setAmount(details.quantity);
+        return;
+      }
+    });
+  }, [user, product]);
+
+  const dispatch = useDispatch();
+
+  async function addItem() {
+    let token = localStorage.getItem('token');
+
+    if (!token)
+      token = sessionStorage.getItem('token');
+
+    const res = await fetch(`/api/cartitem/${product._id}/${amount}`, {
+      method: "POST",
+      headers: {
+        "token": `${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    const alert = document.getElementById("alertContainer");
+
+    if (data.success) {
+      dispatch(updateUser(data.user));
+      dispatch(updateCarts(data.carts));
+
+      alert.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          <strong>Success!</strong> Item added to cart.
+        </div>
+      `;
+    }
+    else {
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
+    }
   }
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <Error />;
   }
 
   return (
@@ -48,20 +115,22 @@ export default function Main() {
           <Carousel product={product} />
           <div className={styles.productDetails}>
             <h3 className={styles.title}>{product.name}</h3>
-            <div className={styles.state}>
-              <FontAwesomeIcon icon="fa-regular fa-circle-check" />
-              <p>In Stock</p>
+            <div className={styles.state} style={product.quantity > 0 ? {} : { backgroundColor: "#ff00000a" }}>
+              <FontAwesomeIcon
+                icon={`fa-regular fa-circle-${product.quantity > 0 ? "check" : "xmark"}`}
+                style={product.quantity > 0 ? { color: "#54ca87" } : { color: "red" }}
+              />
+              <p style={product.quantity > 0 ? {} : { color: "red" }}>{product.quantity > 0 ? "In" : "Out of"} Stock</p>
             </div>
             <div className={styles.price}>
-              <p>{product.price}EGP</p>
+              <p>{product.price}.00 EGP</p>
               <del>
-                {Math.floor((product.price / (100 - product.discount)) * 100)}
-                EGP
+                {Math.floor((product.price / (100 - product.discount)) * 100)}.00 EGP
               </del>
             </div>
             <div className={styles.buttonsBox}>
               <div className={styles.amountContainer}>
-                <button onClick={decreaseAmount}>-</button>
+                <button onClick={decreaseAmount} disabled={product.quantity == 0 || inCart}>-</button>
                 <input
                   type="number"
                   value={amount}
@@ -70,10 +139,11 @@ export default function Main() {
                     if (e.target.value === "") e.target.value = 1;
                     setAmount(e.target.value);
                   }}
+                  disabled={product.quantity == 0 || inCart}
                 />
-                <button onClick={increaseAmount}>+</button>
+                <button onClick={increaseAmount} disabled={product.quantity == 0 || inCart}>+</button>
               </div>
-              <button>Add to cart</button>
+              <button disabled={product.quantity == 0 || inCart} onClick={addItem} >{inCart ? "In" : "Add to"} cart</button>
               <button>
                 <FontAwesomeIcon icon="fa-regular fa-heart" />
                 <p>Add to wishlist</p>
@@ -88,36 +158,32 @@ export default function Main() {
             </div>
             <div className={styles.categories}>
               <p style={{ display: "inline" }}>categories: </p>
-              {product.categories.map((category) => (
-                <>
+              {product.categories.map((category) => {
+                return <>
                   <Link
+                    key={category}
                     href={`/pages/products?category=${category.toLowerCase()}`}
-                    onClick={() => closeBtn.current.click()}
                   >
                     {category}
                   </Link>{" "}
-                </>
-              ))}
+                  </>
+              })}
             </div>
           </div>
         </div>
         <div className={styles.productDescription}>
           <h4>Description:</h4>
-          <p>
-            {product.description.map((desc) => (
-              <>
-                <p>{desc}</p>
-              </>
-            ))}
+          <div>
+            {product.description.map((desc) => {
+              return <p>{desc}</p>;
+            })}
             <br />
             <br />
-            Specifications:
-            {product.specifications.map((spec) => (
-              <>
-                <p>{spec}</p>
-              </>
-            ))}
-          </p>
+            <strong style={{fontSize: "larger"}}>Specifications:</strong>
+            {product.specifications.map((spec) => {
+              return <p>{spec}</p>;
+            })}
+          </div>
         </div>
         <RelatedProducts product={product} />
       </div>
@@ -140,7 +206,7 @@ function RelatedProducts({ product }) {
       });
     });
     setRelatedProducts(set);
-  }, [products]);
+  }, [product, products]);
 
   function slideLeft() {
     container.current.scrollBy({ left: -260, behavior: "smooth" });
@@ -154,7 +220,6 @@ function RelatedProducts({ product }) {
     <div className={`${styles.section}`}>
       <div className={styles.header}>
         <h4>Related Products </h4>
-        <Link href="/">View All →</Link>
       </div>
       <div className={styles.content}>
         <button onClick={slideLeft}>&lt;</button>

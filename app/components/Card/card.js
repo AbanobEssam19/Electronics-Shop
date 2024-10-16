@@ -70,6 +70,7 @@ export default function Card({ product }) {
       products &&
       user.cart.map((id) => {
         const details = carts.find((item) => item._id == id);
+        if (!details) return;
         const check = products.find((item) => item._id == details.product);
         if (check._id == product._id) {
           setInCart(true);
@@ -83,7 +84,7 @@ export default function Card({ product }) {
       const inside = user.wishlist.find((el) => el == product._id);
       if (inside) setInWishList(true);
     }
-  }, [user]);
+  }, [user, product]);
   useEffect(() => {
     if (inWishList) {
       heartIconRef.current.style.color = "red";
@@ -92,6 +93,16 @@ export default function Card({ product }) {
     }
   }, [inWishList]);
   const wishListHandler = async () => {
+    if (!user) {
+      const alert = document.getElementById("alertContainer");
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
+      return;
+    }
     const res = await fetch(`/api/addtowishlist/${product._id}`, {
       method: "POST",
       headers: {
@@ -140,7 +151,7 @@ export default function Card({ product }) {
           />
         </button>
       </div>
-      <Link href="/" className={styles.anchor}>
+      <Link href={`/pages/product?id=${product._id}`} className={styles.anchor}>
         <h3 className={styles.title}>{product.name}</h3>
       </Link>
       <div className={styles.lowerPart}>

@@ -15,7 +15,9 @@ const Users = mongoose.model('Users',
         city: {type: String, default: ""},
         region: {type: String, default: ""},
         orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Orders' , default: []}],
-        printingOrders:[{ type: mongoose.Schema.Types.ObjectId, ref: 'printingOrders' , default: []}]
+        printingOrders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PrintingOrders' , default: []}],
+        total: {type: Number, default: 0},
+        usedCoupons: [{type: mongoose.Schema.Types.ObjectId, ref: 'Coupons', default: []}]
     }
 )
 

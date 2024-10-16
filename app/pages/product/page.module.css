@@ -24,7 +24,7 @@
 }
 
 .state {
-  width: 100px;
+  width: 120px;
   height: 40px;
   background-color: #f4faf6;
   display: flex;
@@ -32,8 +32,7 @@
   justify-content: space-evenly;
 }
 
-.state p,
-.state path {
+.state p {
   color: #00a046;
 }
 

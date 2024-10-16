@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCarts } from "@/app/states/reducers/cartsSlice";
+import Error from "../Error/page";
 
 function WishlistItem({ id, selectedItems, setSelectedItems }) {
   const products = useSelector((state) => state.productsData.data);
@@ -26,7 +27,7 @@ function WishlistItem({ id, selectedItems, setSelectedItems }) {
             : "fa-solid fa-circle-xmark"
         }
       />
-      <p>{product.quantity ? "In Stock" : "Out of Stock"}</p>
+      <p className={styles.stockStatus}>{product.quantity ? "In Stock" : "Out of Stock"}</p>
     </div>
   );
   const handleCheck = (e) => {
@@ -45,7 +46,7 @@ function WishlistItem({ id, selectedItems, setSelectedItems }) {
           className={styles.center}
         />
       </td>
-      <td>
+      <td className={styles.productImg}>
         <div className={styles.center}>
           <img
             className={styles.product_image}
@@ -53,7 +54,7 @@ function WishlistItem({ id, selectedItems, setSelectedItems }) {
           />
         </div>
       </td>
-      <td>{product.name}</td>
+      <td className={styles.productName}>{product.name}</td>
       <td>{product.price} EGP</td>
       <td>{inStockStatusIcon}</td>
       <td>
@@ -83,6 +84,7 @@ export default function Wishlist() {
     if (data.success) {
       dispatch(updateUser(data.user));
       dispatch(updateCarts(data.carts));
+      window.location.href = "/pages/cart";
     }
   };
   const handleRemoveAll = async () => {
@@ -128,6 +130,11 @@ export default function Wishlist() {
       }
     }
   };
+
+  if (!user || user.wishlist.length == 0) {
+    return <Error />;
+  }
+
   return (
     <>
       <div className={`container ${styles.main}`}>
@@ -136,7 +143,7 @@ export default function Wishlist() {
           <thead>
             <tr>
               <th></th>
-              <th></th>
+              <th className={styles.tableHeadPhoto}></th>
               <th>Product Name</th>
               <th>Unit Price</th>
               <th>Stock Status</th>

@@ -35,8 +35,6 @@ export default function Products() {
 
   const paginationRef = useRef(null);
 
-  const [currentProduct, setCurrentProduct] = useState(null);
-
   const [title, setTitle] = useState("");
 
   const search = searchParams.get('search');
@@ -44,8 +42,6 @@ export default function Products() {
   const sale = searchParams.get('sale');
 
   const products = useSelector((state) => state.productsData.data);
-  const user = useSelector((state) => state.userData.data);
-  const carts = useSelector((state) => state.cartsData.data);
   const dispatch = useDispatch();
   
 
@@ -340,7 +336,7 @@ export default function Products() {
           <div className={`col-9 ${styles.ProductsList}`}>
             {
               current.slice(startInd * arrSize, Math.min(current.length, (startInd + 1) * arrSize)).map((product) => (
-                checkSale(product) && checkStock(product) && product.price >= minPrice && product.price <= maxPrice && <Card key={product.id} product={product} setCurrentProduct={setCurrentProduct} />
+                checkSale(product) && checkStock(product) && product.price >= minPrice && product.price <= maxPrice && <Card key={product.id} product={product} />
               ))
             }
           </div>
@@ -357,7 +353,6 @@ export default function Products() {
             </ul>
           </nav>
         </div>
-        <Modal currentProduct={currentProduct} />
       </div>
     </>
   );

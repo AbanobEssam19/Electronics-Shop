@@ -19,14 +19,9 @@ export default function Checkout() {
 
   const searchParams = useSearchParams();
   const shipping = searchParams.get('shipping');
+  const couponID = searchParams.get('coupon');
 
-  if (!shipping) {
-    return (
-      <div style={{minHeight: '500px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <p style={{fontSize: '25px'}}>You need to view your cart first, <Link href="/pages/cart" style={{color: 'var(--main)'}}>go to cart.</Link></p>
-      </div>
-    )
-  }
+  const [coupons, setCoupons] = useState(null);
 
   useEffect(() => {
     let token = localStorage.getItem('token');
@@ -35,24 +30,26 @@ export default function Checkout() {
       token = sessionStorage.getItem('token');
 
     dispatch(fetchUser(token));
+
+    async function getCoupons() {
+      const res = await fetch("/api/coupons");
+      const data = await res.json();
+      setCoupons(data.coupons);
+    }
+
+    getCoupons();
   }, []);
 
-  const total = useMemo(() => {
-    if (!user || !carts || !products) return 0;
+  const [coupon, setCoupon] = useState(null);
 
-    let newTotal = shipping == "true" ? 50 : 0;
-    user.cart.forEach((id) => {
-      const details = carts.find((cart) => cart._id === id);
-      if (details) {
-        const product = products.find((product) => product._id === details.product);
-        if (product) {
-          newTotal += product.price * details.quantity;
-        }
-      }
-    });
+  useEffect(() => {
+    if (!coupons)
+      return;
 
-    return newTotal;
-  }, [user]);
+    const coupon = coupons.find(coupon => coupon._id == couponID);
+
+    setCoupon(coupon);
+  }, [couponID, coupons]);
 
   const [userData, setUserData] = useState({
     firstName: '',
@@ -108,7 +105,7 @@ export default function Checkout() {
       return;
     }
 
-    const res = await fetch(`/api/order/${user._id}`, {
+    const res = await fetch(`/api/order/${user._id}/${coupon ? coupon._id : "none"}`, {
       method: "POST",
       headers: {
         "content-type": "application/json"
@@ -128,6 +125,14 @@ export default function Checkout() {
       `;
       ordersPageRef.current.click();
     }
+    else {
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          ${data.error}
+        </div>
+      `;
+    }
 
   }
 
@@ -135,13 +140,21 @@ export default function Checkout() {
     return <Error />;
   }
 
-  if (user && !user.cart.length) {
+  if (!shipping) {
+    return (
+      <div style={{ minHeight: '500px', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <p style={{ fontSize: '25px' }}>You need to choose shipping method first, <Link href="/pages/cart" style={{ color: 'var(--main)' }}>from here.</Link></p>
+      </div>
+    )
+  }
+
+  if (!user.cart.length) {
     return <EmptyCart />;
   }
-  
+
   return (
     <form className="container" style={{ marginTop: '50px' }}>
-      <Link href="/pages/myaccount/orders" style={{display: 'none'}} ref={ordersPageRef}></Link>
+      <Link href="/pages/myaccount/orders" style={{ display: 'none' }} ref={ordersPageRef}></Link>
       <div className={`container ${styles.main}`}>
         <div className={styles.formClass}>
           <div className={styles.inputCollection}>
@@ -256,8 +269,12 @@ export default function Checkout() {
             <p>{userData.shipping || 0}.00 EGP</p>
           </div>
           <div className={styles.group}>
+            <p style={{ fontWeight: "bold" }}>Discount</p>
+            <p style={{ fontWeight: "bold" }}>{coupon ? -coupon.discount : 0}.00 EGP</p>
+          </div>
+          <div className={styles.group}>
             <p style={{ fontWeight: "bold" }}>Total</p>
-            <p style={{ fontWeight: "bold" }}>{total}.00 EGP</p>
+            <p style={{ fontWeight: "bold" }}>{(user.total + userData.shipping) - (coupon ? coupon.discount : 0)}.00 EGP</p>
           </div>
           <button type="submit" onClick={checkout}>Place Order</button>
         </div>
