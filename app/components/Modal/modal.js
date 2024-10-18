@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "@/app/states/reducers/userSlice";
-import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
 import alertStyles from "@/app/components/Alerts/alerts.module.css";
 
@@ -15,14 +14,12 @@ export default function Modal() {
 
   const product = useSelector((state) => state.modalData.data);
   const user = useSelector((state) => state.userData.data);
-  const carts = useSelector((state) => state.cartsData.data);
-  const products = useSelector((state) => state.productsData.data);
 
   const dispatch = useDispatch();
 
   const closeBtn = useRef(null);
 
-  const [amount, setAmount] = useState();
+  const [amount, setAmount] = useState(1);
   const amountRef = useRef();
 
   function increaseAmount() {
@@ -37,16 +34,15 @@ export default function Modal() {
   }
 
   async function addItem() {
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem("token");
 
-    if (!token)
-      token = sessionStorage.getItem('token');
+    if (!token) token = sessionStorage.getItem("token");
 
     const res = await fetch(`/api/cartitem/${product._id}/${amount}`, {
       method: "POST",
       headers: {
-        "token": `${token}`
-      }
+        token: `${token}`,
+      },
     });
 
     const data = await res.json();
@@ -55,8 +51,7 @@ export default function Modal() {
 
     if (data.success) {
       dispatch(updateUser(data.user));
-      dispatch(updateCarts(data.carts));
-
+      
       alert.innerHTML = `
         <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -73,22 +68,6 @@ export default function Modal() {
       `;
     }
   }
-
-  const [inCart, setInCart] = useState(false);
-
-  useEffect(() => {
-    setInCart(false);
-    setAmount(1);
-    user && carts && products && product && user.cart.map((id) => {
-      const details = carts.find((item) => item._id == id);
-      const check = products.find((item) => item._id == details.product);
-      if (check._id == product._id) {
-        setInCart(true);
-        setAmount(details.quantity);
-        return;
-      }
-    });
-  }, [user, product]);
 
   const [inWishList, setInWishList] = useState(false);
 
@@ -180,7 +159,7 @@ export default function Modal() {
               </div>
               <div className={styles.buttonsBox}>
                 <div className={styles.amountContainer}>
-                  <button onClick={decreaseAmount} disabled={(product && product.quantity == 0) || inCart}>-</button>
+                  <button onClick={decreaseAmount} disabled={product && product.quantity == 0}>-</button>
                   <input
                     type="number"
                     value={amount}
@@ -189,11 +168,11 @@ export default function Modal() {
                       if (e.target.value === "") e.target.value = 1;
                       setAmount(e.target.value);
                     }}
-                    disabled={(product && product.quantity == 0) || inCart}
+                    disabled={product && product.quantity == 0}
                   />
-                  <button onClick={increaseAmount} disabled={(product && product.quantity == 0) || inCart}>+</button>
+                  <button onClick={increaseAmount} disabled={product && product.quantity == 0}>+</button>
                 </div>
-                <button disabled={(product && product.quantity == 0) || inCart} onClick={addItem} >{inCart ? "In" : "Add to"} cart</button>
+                <button disabled={product && product.quantity == 0} onClick={addItem} >Add to cart</button>
                 <button onClick={wishListHandler}>
                   <FontAwesomeIcon icon={`fa-${inWishList ? "solid" : "regular"} fa-heart`} style={inWishList ? { color: "red" } : {}} />
                   <p>{inWishList ? "Remove from" : `Add to`} wishlist</p>

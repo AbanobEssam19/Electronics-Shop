@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "@/app/states/reducers/userSlice";
-import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
 import alertStyles from "@/app/components/Alerts/alerts.module.css";
 
@@ -37,7 +36,6 @@ export default function Card({ product }) {
 
     if (data.success) {
       dispatch(updateUser(data.user));
-      dispatch(updateCarts(data.carts));
       
       alert.innerHTML = `
         <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
@@ -56,27 +54,17 @@ export default function Card({ product }) {
     }
   }
 
-  const products = useSelector((state) => state.productsData.data);
   const user = useSelector((state) => state.userData.data);
-  const carts = useSelector((state) => state.cartsData.data);
 
   const [inCart, setInCart] = useState(false);
   const [inWishList, setInWishList] = useState(false);
   const heartIconRef = useRef(null);
   useEffect(() => {
     setInCart(false);
-    user &&
-      carts &&
-      products &&
-      user.cart.map((id) => {
-        const details = carts.find((item) => item._id == id);
-        if (!details) return;
-        const check = products.find((item) => item._id == details.product);
-        if (check._id == product._id) {
-          setInCart(true);
-          return;
-        }
-      });
+    if (user && product) {
+      const exist = user.cart.find((item) => item.productID == product._id);
+      if (exist) setInCart(true);
+  }
   }, [user, product]);
   useEffect(() => {
     setInWishList(false);
@@ -164,7 +152,7 @@ export default function Card({ product }) {
         <button
           className={styles.shoppingCart}
           onClick={addItem}
-          disabled={inCart}
+          disabled={inCart || product.quantity == 0}
         >
           <FontAwesomeIcon
             icon={`fa-solid fa-${inCart ? "check" : "cart-shopping"}`}

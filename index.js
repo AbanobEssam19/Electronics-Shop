@@ -9,7 +9,6 @@ server.use(express.json());
 
 const users = require("./models/users");
 const products = require("./models/products");
-const carts = require("./models/carts");
 const orders = require("./models/orders");
 const coupons = require("./models/coupons");
 const printingOrders = require("./models/printingOrders");
@@ -155,18 +154,13 @@ app.prepare().then(() => {
   });
 
   server.get("/api/user", authenticateToken, async (req, res) => {
-    const user = await users.findById(req.user.id);
+    const user = await users.findById(req.user.id).populate('cart.product').exec();
     return res.json({ user: user });
   });
 
   server.get("/api/orders", async (req, res) => {
     const order = await orders.find();
     return res.json({ orders: order });
-  });
-
-  server.get("/api/carts", async (req, res) => {
-    const cart = await carts.find();
-    return res.json({ carts: cart });
   });
 
   server.get("/api/coupons", async (req, res) => {
@@ -187,70 +181,55 @@ app.prepare().then(() => {
       const productID = req.params.id;
       const quantity = req.params.quantity;
 
-      const data = {
-        product: productID,
-        quantity: quantity,
-      };
-
-      const cart = await carts.insertMany([data]);
-
-      const user = await users.findById(userID);
-      let newCart = [...user.cart];
-
-      newCart.push(cart[0].id);
-
       const product = await products.findById(productID);
 
-      await users.updateOne({ _id: userID }, { $set: { cart: newCart, total: user.total + (product.price * quantity) } });
+      const exist = await users.findOne({
+        _id: userID,
+        "cart.productID": productID
+      });
 
-      const newUser = await users.findById(userID);
+      if (exist) {
+        await users.findOneAndUpdate(
+          { _id: userID, "cart.productID": productID },
+          { $inc: { "cart.$.quantity": quantity, total: (quantity * product.price) } },
+          { new: true }
+        );
+      }
+      else {
+        await users.findByIdAndUpdate(
+          userID,
+          {
+            $push: { cart: { product: productID, productID: productID, quantity: quantity } },
+            $inc: { total: (quantity * product.price) }
+          }
+        );
 
-      await products.findByIdAndUpdate(productID, { $set: { popularity: product.popularity + 1 } });
-
-      const newProducts = await products.find();
-
-      const newCarts = await carts.find();
-
-      return res.json({ success: true, user: newUser, carts: newCarts, products: newProducts });
+        await products.findByIdAndUpdate(productID, { $inc: { popularity: 1 } });
+      }
+      const newUser = await users.findById(userID).populate('cart.product').exec();
+      return res.json({ success: true, user: newUser });
     });
 
   server.delete("/api/cartitem/:id", authenticateToken, async (req, res) => {
     const userID = req.user.id;
-    const cartID = req.params.id;
+    const productID = req.params.id;
 
-    const user = await users.findById(userID);
+    const user = await users.findById(userID).populate('cart.product').exec();
 
-    let newCart = [];
+    const cartItem = user.cart.find((item) => item.productID == productID);
 
-    let productID;
+    await products.findByIdAndUpdate(productID, { $inc: { popularity: -1 } });
 
-    let productQuantity;
-
-    for (const item of user.cart) {
-      if (item == cartID) {
-        const cart = await carts.findById(cartID);
-        productID = cart.product;
-        productQuantity = cart.quantity;
-        await carts.findByIdAndDelete(item);
+    await users.findByIdAndUpdate(
+      userID,
+      {
+        $pull: { cart: { productID: productID } },
+        $set: { total: user.total - (cartItem.product.price * cartItem.quantity) }
       }
-      else {
-        newCart.push(item);
-      }
-    }
-    
-    const product = await products.findById(productID);
-    
-    await users.findByIdAndUpdate(userID, { $set: { cart: newCart, total: user.total - (product.price * productQuantity) } });
-    
-    const newUser = await users.findById(userID);
+    );
 
-    await products.findByIdAndUpdate(productID, { $set: { popularity: product.popularity - 1 } });
-
-    const newProducts = await products.find();
-
-    const newCarts = await carts.find();
-
-    return res.json({ success: true, user: newUser, carts: newCarts, products: newProducts });
+    const newUser = await users.findById(userID).populate('cart.product').exec();
+    return res.json({ success: true, user: newUser });
   });
 
   server.put(
@@ -258,26 +237,25 @@ app.prepare().then(() => {
     authenticateToken,
     async (req, res) => {
       const userID = req.user.id;
-      const cartID = req.params.id;
+      const productID = req.params.id;
       const quantity = req.params.quantity;
 
-      const cart = await carts.findById(cartID);
+      const user = await users.findById(userID).populate('cart.product').exec();
 
-      const product = await products.findById(cart.product);
+      const cartItem = user.cart.find((item) => item.productID == productID);
 
-      const def = quantity - cart.quantity;
+      const def = quantity - cartItem.quantity;
 
-      const user = await users.findById(userID);
+      await users.findOneAndUpdate(
+        { _id: userID, "cart.productID": productID },
+        {
+          $inc: { "cart.$.quantity": def },
+          $set: { total: user.total + (cartItem.product.price * def) }
+        },
+      );
 
-      await users.findByIdAndUpdate(userID, { $set: { total: user.total + (product.price * def) } });
-
-      await carts.findByIdAndUpdate(cartID, { $set: { quantity: quantity } });
-
-      const allCarts = await carts.find();
-
-      const newUser = await users.findById(userID);
-
-      return res.json({ success: true, carts: allCarts, user: newUser });
+      const newUser = await users.findById(userID).populate('cart.product').exec();
+      return res.json({ success: true, user: newUser });
     }
   );
 
@@ -286,29 +264,24 @@ app.prepare().then(() => {
     const userID = req.params.id;
     const couponID = req.params.coupon;
 
-    const user = await users.findById(userID);
+    const user = await users.findById(userID).populate('cart.product').exec();
 
     let productsArr = [];
 
-    for (const id of user.cart) {
-      const cart = await carts.findById(id);
-      const product = await products.findById(cart.product);
-      if (cart.quantity > product.quantity) {
-        return res.json({ success: false, error: `Not enough stock for product ${product.name}` });
+    for (const item of user.cart) {
+      if (item.quantity > item.product.quantity) {
+        return res.json({ success: false, error: `Not enough stock for product ${item.product.name}` });
       }
     }
 
-    for (const id of user.cart) {
-      const cart = await carts.findById(id);
-      productsArr.push(cart.product);
-      const product = await products.findById(cart.product);
-      await products.findByIdAndUpdate(cart.product, { $set: { popularity: product.popularity - 1, quantity: product.quantity - cart.quantity } });
-      await carts.findByIdAndDelete(id);
+    for (const item of user.cart) {
+      productsArr.push(item);
+      await products.findByIdAndUpdate(item.productID, { $set: { popularity: item.product.popularity - 1, quantity: item.product.quantity - item.quantity } });
     }
 
     const coupon = couponID != "none" ? await coupons.findById(couponID) : null;
 
-    let total = shipping + user.total -  (coupon ? coupon.discount : 0);
+    let total = shipping + user.total - (coupon ? coupon.discount : 0);
 
     const ordersArr = await orders.find();
 
@@ -316,7 +289,7 @@ app.prepare().then(() => {
 
     const order = await orders.insertMany([{
       orderID: number + 42100,
-      products: productsArr,
+      cart: productsArr,
       date: new Date(),
       total: total,
       shipping: shipping ? true : false,
@@ -340,7 +313,7 @@ app.prepare().then(() => {
 
     await users.updateOne({ _id: userID }, { $set: { cart: [], firstname: firstName, lastname: lastName, address: address, city: city, region: region, orders: userOrders, usedCoupons: usedCoupons, total: 0 } });
 
-    const newUser = await users.findById(userID);
+    const newUser = await users.findById(userID).populate('cart.product').exec();
 
     return res.json({ success: true, user: newUser });
   });
@@ -407,18 +380,12 @@ app.prepare().then(() => {
     const updateuser = await users.findByIdAndUpdate(userid, {
       $set: { printingOrders: ordersarr },
     });
-    
+
     return res.json({ success: true, user: updateuser });
   });
 
   server.post("/api/coupon", async (req, res) => {
-    const { code, expiryDate, discount, newUser } = req.body;
-    await coupons.insertMany([{
-      code: code,
-      expiryDate: expiryDate,
-      discount: discount,
-      newUser: newUser
-    }]);
+    await coupons.insertMany([req.body]);
   });
 
   server.delete("/api/wishlist", async (req, res) => {

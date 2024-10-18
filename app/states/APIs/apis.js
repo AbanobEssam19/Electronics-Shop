@@ -15,9 +15,3 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (token) => {
     const data = await res.json();
     return data.user;
 });
-
-export const fetchCarts = createAsyncThunk("carts/fetchCarts", async () => {
-    const res = await fetch("/api/carts");
-    const data = await res.json();
-    return data.carts;
-});

@@ -7,7 +7,6 @@ import Link from "next/link";
 
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "@/app/states/reducers/userSlice";
-import { updateCarts } from "@/app/states/reducers/cartsSlice";
 import { useEffect, useState, useRef } from "react";
 import EmptyCart from "../EmptyCart/page";
 import Error from "../Error/page";
@@ -23,7 +22,7 @@ function CartItem({ product, cart, clearCoupon }) {
         if (!token)
             token = sessionStorage.getItem('token');
 
-        const res = await fetch(`/api/cartitem/${cart._id}`, {
+        const res = await fetch(`/api/cartitem/${product._id}`, {
             method: "DELETE",
             headers: {
                 'token': `${token}`
@@ -33,7 +32,6 @@ function CartItem({ product, cart, clearCoupon }) {
         const data = await res.json();
         if (data.success) {
             dispatch(updateUser(data.user));
-            dispatch(updateCarts(data.carts));
         }
 
         clearCoupon();
@@ -61,7 +59,7 @@ function CartItem({ product, cart, clearCoupon }) {
         if (!token)
             token = sessionStorage.getItem('token');
 
-        const res = await fetch(`/api/cartitem/${cart._id}/${quantity}`, {
+        const res = await fetch(`/api/cartitem/${product._id}/${quantity}`, {
             method: "PUT",
             headers: {
                 'token': `${token}`
@@ -70,7 +68,6 @@ function CartItem({ product, cart, clearCoupon }) {
 
         const data = await res.json();
         if (data.success) {
-            dispatch(updateCarts(data.carts));
             dispatch(updateUser(data.user));
             quantityInput.current.value = quantity;
             setItemQuantity(quantity);
@@ -107,8 +104,6 @@ function CartItem({ product, cart, clearCoupon }) {
 export default function ShoppingCart() {
 
     const user = useSelector((state) => state.userData.data);
-    const carts = useSelector((state) => state.cartsData.data);
-    const products = useSelector((state) => state.productsData.data);
 
     const [coupons, setCoupons] = useState(null);
 
@@ -211,10 +206,8 @@ export default function ShoppingCart() {
                         </thead>
                         <tbody>
                             {
-                                user && products && carts && user.cart.map((id) => {
-                                    const cart = carts.find((item) => item._id == id);
-                                    const product = products.find((item) => item._id == cart.product);
-                                    return <CartItem key={id} product={product} cart={cart} clearCoupon={clearCoupon} />;
+                                user.cart.map((item) => {
+                                    return <CartItem key={item.product._id} product={item.product} cart={item} clearCoupon={clearCoupon} />;
                                 })
                             }
                         </tbody>

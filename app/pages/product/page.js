@@ -11,7 +11,6 @@ import { useState, useRef, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "@/app/states/reducers/userSlice";
-import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
 import Error from "../Error/page";
 
@@ -46,37 +45,19 @@ export default function Product() {
     setAmount(amountRef.current.value);
   }
   const user = useSelector((state) => state.userData.data);
-  const carts = useSelector((state) => state.cartsData.data);
-
-  const [inCart, setInCart] = useState(false);
-
-  useEffect(() => {
-    setInCart(false);
-    setAmount(1);
-    user && carts && products && product && user.cart.map((id) => {
-      const details = carts.find((item) => item._id == id);
-      const check = products.find((item) => item._id == details.product);
-      if (check._id == product._id) {
-        setInCart(true);
-        setAmount(details.quantity);
-        return;
-      }
-    });
-  }, [user, product]);
 
   const dispatch = useDispatch();
 
   async function addItem() {
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem("token");
 
-    if (!token)
-      token = sessionStorage.getItem('token');
+    if (!token) token = sessionStorage.getItem("token");
 
     const res = await fetch(`/api/cartitem/${product._id}/${amount}`, {
       method: "POST",
       headers: {
-        "token": `${token}`
-      }
+        token: `${token}`,
+      },
     });
 
     const data = await res.json();
@@ -85,8 +66,7 @@ export default function Product() {
 
     if (data.success) {
       dispatch(updateUser(data.user));
-      dispatch(updateCarts(data.carts));
-
+      
       alert.innerHTML = `
         <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -167,7 +147,7 @@ export default function Product() {
             </div>
             <div className={styles.buttonsBox}>
               <div className={styles.amountContainer}>
-                <button onClick={decreaseAmount} disabled={product.quantity == 0 || inCart}>-</button>
+                <button onClick={decreaseAmount} disabled={product.quantity == 0}>-</button>
                 <input
                   type="number"
                   value={amount}
@@ -176,11 +156,11 @@ export default function Product() {
                     if (e.target.value === "") e.target.value = 1;
                     setAmount(e.target.value);
                   }}
-                  disabled={product.quantity == 0 || inCart}
+                  disabled={product.quantity == 0}
                 />
-                <button onClick={increaseAmount} disabled={product.quantity == 0 || inCart}>+</button>
+                <button onClick={increaseAmount} disabled={product.quantity == 0}>+</button>
               </div>
-              <button disabled={product.quantity == 0 || inCart} onClick={addItem} >{inCart ? "In" : "Add to"} cart</button>
+              <button disabled={product.quantity == 0} onClick={addItem} >Add to cart</button>
               <button onClick={wishListHandler}>
                 <FontAwesomeIcon icon={`fa-${inWishList ?  "solid" : "regular"} fa-heart`} style={inWishList ? { color: "red" } : {}} />
                 <p>{inWishList ? "Remove from" : `Add to`} wishlist</p>

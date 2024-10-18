@@ -1,8 +1,7 @@
 'use client'
 import styles from "./page.module.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState, useMemo, useRef } from "react";
-import { fetchUser } from "@/app/states/APIs/apis";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { updateUser } from "@/app/states/reducers/userSlice";
 import Error from "../Error/page";
@@ -14,8 +13,6 @@ import alertStyles from "@/app/components/Alerts/alerts.module.css";
 export default function Checkout() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userData.data);
-  const carts = useSelector((state) => state.cartsData.data);
-  const products = useSelector((state) => state.productsData.data);
 
   const searchParams = useSearchParams();
   const shipping = searchParams.get('shipping');
@@ -24,13 +21,6 @@ export default function Checkout() {
   const [coupons, setCoupons] = useState(null);
 
   useEffect(() => {
-    let token = localStorage.getItem('token');
-
-    if (!token)
-      token = sessionStorage.getItem('token');
-
-    dispatch(fetchUser(token));
-
     async function getCoupons() {
       const res = await fetch("/api/coupons");
       const data = await res.json();
@@ -251,13 +241,11 @@ export default function Checkout() {
             </div>
             <div className={styles.orderBody}>
               {
-                user && products && carts && user.cart.map((id) => {
-                  const details = carts.find((item) => item._id == id);
-                  const product = products.find((item) => details.product == item._id);
+                user && user.cart.map((item) => {
                   return (
-                    <div className={styles.orderData} key={product._id}>
-                      <p>{product.name} <span style={{ color: "red" }}>x{details.quantity}</span></p>
-                      <p>{product.price * details.quantity}.00 EGP</p>
+                    <div className={styles.orderData} key={item.productID}>
+                      <p>{item.product.name} <span style={{ color: "red" }}>x{item.quantity}</span></p>
+                      <p>{item.product.price * item.quantity}.00 EGP</p>
                     </div>
                   )
                 })

@@ -6,19 +6,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateCarts } from "@/app/states/reducers/cartsSlice";
 import Error from "../Error/page";
 import EmptyWishlist from "../EmptyWishlist/page";
 
-function WishlistItem({ id, selectedItems, setSelectedItems }) {
+function WishlistItem({ id, setSelectedItems }) {
   const products = useSelector((state) => state.productsData.data);
   const [product, setProduct] = useState(null);
   useEffect(() => {
     if (products) setProduct(products.find((el) => el._id == id));
   }, [products]);
+  
   if (!product) {
     return <div>loading...</div>;
   }
+  
   const inStockStatusIcon = (
     <div className={product.quantity ? styles.state : styles.state2}>
       <FontAwesomeIcon
@@ -31,6 +32,7 @@ function WishlistItem({ id, selectedItems, setSelectedItems }) {
       <p className={styles.stockStatus}>{product.quantity ? "In Stock" : "Out of Stock"}</p>
     </div>
   );
+
   const handleCheck = (e) => {
     if (e.target.checked) {
       setSelectedItems((prev) => [...prev, product]);
@@ -38,6 +40,45 @@ function WishlistItem({ id, selectedItems, setSelectedItems }) {
       setSelectedItems((prev) => prev.filter((el) => el._id !== product._id));
     }
   };
+
+  async function addToCart() {
+    let token = localStorage.getItem('token');
+
+    if (!token)
+      token = sessionStorage.getItem('token');
+
+    const res = await fetch(`/api/cartitem/${product._id}/${1}`, {
+      method: "POST",
+      headers: {
+        "token": `${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    const alert = document.getElementById("alertContainer");
+
+    if (data.success) {
+      dispatch(updateUser(data.user));
+      dispatch(updateCarts(data.carts));
+
+      alert.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          <strong>Success!</strong> Item added to cart.
+        </div>
+      `;
+    }
+    else {
+      alert.innerHTML = `
+        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          You need to login first!
+        </div>
+      `;
+    }
+  }
+
   return (
     <tr>
       <td>
@@ -69,7 +110,6 @@ function WishlistItem({ id, selectedItems, setSelectedItems }) {
 
 export default function Wishlist() {
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.productsData.data);
   const user = useSelector((state) => state.userData.data);
   const [selectedItems, setSelectedItems] = useState([]);
   const actionRef = useRef(null);
@@ -102,32 +142,20 @@ export default function Wishlist() {
     }
   };
   const handleApply = async () => {
-    let res;
-    if (actionRef.current.value == "add") {
-      res = await fetch("/api/wishlistsome", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ selectedItems: selectedItems, user: user }),
-      });
-    } else {
-      res = await fetch("/api/wishlistsome", {
-        method: "DELETE",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ selectedItems: selectedItems, user: user }),
-      });
-    }
+    let res = await fetch("/api/wishlistsome", {
+      method: `${actionRef.current.value == "add" ? "POST" : "DELETE"}`,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ selectedItems: selectedItems, user: user }),
+    });
     const data = await res.json();
     if (data.success) {
       const modifiedUser = await data.modifiedUser;
-      console.log(modifiedUser);
+      setSelectedItems([]);
       dispatch(updateUser({ ...user, ...modifiedUser }));
       if (actionRef.current.value == "add") {
-        const carts = await data.carts;
-        dispatch(updateCarts(carts));
+        dispatch(updateCarts(data.carts));
       }
     }
   };

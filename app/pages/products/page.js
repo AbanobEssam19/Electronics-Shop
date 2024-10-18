@@ -8,10 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useSearchParams } from 'next/navigation';
 
-import Link from "next/link";
-import Modal from "@/app/components/Modal/modal";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCarts, fetchProducts, fetchUser } from "@/app/states/APIs/apis";
+import { fetchProducts, fetchUser } from "@/app/states/APIs/apis";
 
 export default function Products() {
   const [minPrice, setMinPrice] = useState(0);
@@ -62,7 +60,6 @@ export default function Products() {
       token = sessionStorage.getItem('token');
     dispatch(fetchUser(token));
     dispatch(fetchProducts());
-    dispatch(fetchCarts());
   }, []);
 
   useEffect(() => {

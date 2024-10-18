@@ -3,11 +3,10 @@ import styles from "./nav.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUser, fetchProducts, fetchCarts } from "@/app/states/APIs/apis";
 import { updateUser } from "@/app/states/reducers/userSlice";
-import { updateCarts } from "@/app/states/reducers/cartsSlice";
 
 import alertStyles from "@/app/components/Alerts/alerts.module.css";
 
@@ -24,7 +23,7 @@ function CartItem({ product, cart }) {
     if (!token)
       token = sessionStorage.getItem('token');
 
-    const res = await fetch(`/api/cartitem/${cart._id}`, {
+    const res = await fetch(`/api/cartitem/${product._id}`, {
       method: "DELETE",
       headers: {
         'token': `${token}`
@@ -34,7 +33,6 @@ function CartItem({ product, cart }) {
     const data = await res.json();
     if (data.success) {
       dispatch(updateUser(data.user));
-      dispatch(updateCarts(data.carts));
     }
   };
 
@@ -57,7 +55,7 @@ function CartItem({ product, cart }) {
     if (!token)
       token = sessionStorage.getItem('token');
 
-    const res = await fetch(`/api/cartitem/${cart._id}/${quantity}`, {
+    const res = await fetch(`/api/cartitem/${product._id}/${quantity}`, {
       method: "PUT",
       headers: {
         'token': `${token}`
@@ -66,11 +64,14 @@ function CartItem({ product, cart }) {
 
     const data = await res.json();
     if (data.success) {
-      dispatch(updateCarts(data.carts));
       dispatch(updateUser(data.user));
       setItemQuantity(quantity);
     }
   };
+
+  if (!product) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.cartItemContainer} >
@@ -101,9 +102,7 @@ function CartItem({ product, cart }) {
 function Nav1() {
   const dispatch = useDispatch();
 
-  const products = useSelector((state) => state.productsData.data);
   const user = useSelector((state) => state.userData.data);
-  const carts = useSelector((state) => state.cartsData.data);
 
   useEffect(() => {
     let token = localStorage.getItem('token');
@@ -111,7 +110,6 @@ function Nav1() {
       token = sessionStorage.getItem('token');
     dispatch(fetchUser(token));
     dispatch(fetchProducts());
-    dispatch(fetchCarts());
   }, []);
 
   const cartButton = useRef(null);
@@ -137,10 +135,10 @@ function Nav1() {
     if (user == null) {
       showError();
     }
-    else if (window.location.pathname == "/pages/checkout" || window.location.pathname == "/pages/cart") {
+    else if (window.location.pathname == "/pages/checkout") {
       window.location.href = "/pages/cart";
     }
-    else {
+    else if (window.location.pathname != "/pages/cart") {
       cartButton.current.click();
     }
   }
@@ -228,12 +226,8 @@ function Nav1() {
         <div className={`offcanvas-body ${styles.cartBody}`}>
           <div className={styles.itemContainer}>
             {
-              user && carts && products && user.cart.map((id) => {
-                const details = carts.find((cart) => cart._id == id);
-                if (details) {
-                  const product = products.find((product) => product._id == details.product);
-                  return <CartItem key={product._id} product={product} cart={details} />
-                }
+              user && user.cart.map((item) => {
+                return <CartItem key={item.product._id} product={item.product} cart={item} />;
               })
             }
           </div>

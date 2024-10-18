@@ -1,12 +1,18 @@
 const mongoose = require('mongoose');
 
+const CartItem = new mongoose.Schema({
+    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Products' },
+    productID: { type: mongoose.Schema.Types.ObjectId, ref: 'Products' },
+    quantity: Number
+});
+
 const Users = mongoose.model('Users', 
     {
         username: String,
         password: String,
         name: String,
         email: String,
-        cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Carts' , default: []}],
+        cart: { type: [CartItem], default: [] },
         wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' , default: []}],
         firstname: {type: String, default: ""},
         lastname: {type: String, default: ""},
