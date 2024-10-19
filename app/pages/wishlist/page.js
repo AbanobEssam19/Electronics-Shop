@@ -15,11 +15,11 @@ function WishlistItem({ id, setSelectedItems }) {
   useEffect(() => {
     if (products) setProduct(products.find((el) => el._id == id));
   }, [products]);
-  
+
   if (!product) {
     return <div>loading...</div>;
   }
-  
+
   const inStockStatusIcon = (
     <div className={product.quantity ? styles.state : styles.state2}>
       <FontAwesomeIcon
@@ -29,7 +29,9 @@ function WishlistItem({ id, setSelectedItems }) {
             : "fa-solid fa-circle-xmark"
         }
       />
-      <p className={styles.stockStatus}>{product.quantity ? "In Stock" : "Out of Stock"}</p>
+      <p className={styles.stockStatus}>
+        {product.quantity ? "In Stock" : "Out of Stock"}
+      </p>
     </div>
   );
 
@@ -42,16 +44,15 @@ function WishlistItem({ id, setSelectedItems }) {
   };
 
   async function addToCart() {
-    let token = localStorage.getItem('token');
+    let token = localStorage.getItem("token");
 
-    if (!token)
-      token = sessionStorage.getItem('token');
+    if (!token) token = sessionStorage.getItem("token");
 
     const res = await fetch(`/api/cartitem/${product._id}/${1}`, {
       method: "POST",
       headers: {
-        "token": `${token}`
-      }
+        token: `${token}`,
+      },
     });
 
     const data = await res.json();
@@ -68,8 +69,7 @@ function WishlistItem({ id, setSelectedItems }) {
           <strong>Success!</strong> Item added to cart.
         </div>
       `;
-    }
-    else {
+    } else {
       alert.innerHTML = `
         <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -121,11 +121,10 @@ export default function Wishlist() {
       },
       body: JSON.stringify(user),
     });
+    console.log(res);
     const data = await res.json();
     if (data.success) {
       dispatch(updateUser(data.user));
-      dispatch(updateCarts(data.carts));
-      window.location.href = "/pages/cart";
     }
   };
   const handleRemoveAll = async () => {
@@ -151,12 +150,8 @@ export default function Wishlist() {
     });
     const data = await res.json();
     if (data.success) {
-      const modifiedUser = await data.modifiedUser;
       setSelectedItems([]);
-      dispatch(updateUser({ ...user, ...modifiedUser }));
-      if (actionRef.current.value == "add") {
-        dispatch(updateCarts(data.carts));
-      }
+      dispatch(updateUser(data.user));
     }
   };
 
@@ -188,6 +183,7 @@ export default function Wishlist() {
               user.wishlist.map((id) => {
                 return (
                   <WishlistItem
+                    key={id}
                     selectedItems={selectedItems}
                     setSelectedItems={setSelectedItems}
                     id={id}
