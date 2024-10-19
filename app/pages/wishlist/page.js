@@ -9,9 +9,13 @@ import { useDispatch, useSelector } from "react-redux";
 import Error from "../Error/page";
 import EmptyWishlist from "../EmptyWishlist/page";
 
+import alertStyles from "@/app/components/Alerts/alerts.module.css";
+
 function WishlistItem({ id, setSelectedItems }) {
   const products = useSelector((state) => state.productsData.data);
   const [product, setProduct] = useState(null);
+
+  const dispatch = useDispatch();
   useEffect(() => {
     if (products) setProduct(products.find((el) => el._id == id));
   }, [products]);
@@ -48,7 +52,7 @@ function WishlistItem({ id, setSelectedItems }) {
 
     if (!token) token = sessionStorage.getItem("token");
 
-    const res = await fetch(`/api/cartitem/${product._id}/${1}`, {
+    const res = await fetch(`/api/cartitem/${product._id}/${1}/true`, {
       method: "POST",
       headers: {
         token: `${token}`,
@@ -61,19 +65,11 @@ function WishlistItem({ id, setSelectedItems }) {
 
     if (data.success) {
       dispatch(updateUser(data.user));
-      dispatch(updateCarts(data.carts));
 
       alert.innerHTML = `
         <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
           <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           <strong>Success!</strong> Item added to cart.
-        </div>
-      `;
-    } else {
-      alert.innerHTML = `
-        <div class="alert alert-danger alert-dismissible fade show ${alertStyles.alert}">
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          You need to login first!
         </div>
       `;
     }
@@ -101,7 +97,7 @@ function WishlistItem({ id, setSelectedItems }) {
       <td>{inStockStatusIcon}</td>
       <td>
         <div className={styles.center}>
-          <button className={styles.add_to_cart_button}>Add to Cart</button>
+          <button className={styles.add_to_cart_button} onClick={addToCart}>Add to Cart</button>
         </div>
       </td>
     </tr>
@@ -113,6 +109,9 @@ export default function Wishlist() {
   const user = useSelector((state) => state.userData.data);
   const [selectedItems, setSelectedItems] = useState([]);
   const actionRef = useRef(null);
+
+  const alertContainer = document.getElementById("alertContainer");
+
   const handleAddAll = async () => {
     const res = await fetch("/api/wishlist", {
       method: "POST",
@@ -121,10 +120,15 @@ export default function Wishlist() {
       },
       body: JSON.stringify(user),
     });
-    console.log(res);
     const data = await res.json();
     if (data.success) {
       dispatch(updateUser(data.user));
+      alertContainer.innerHTML = `
+        <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          <strong>Success!</strong> Items added to cart.
+        </div>
+      `;
     }
   };
   const handleRemoveAll = async () => {
@@ -152,6 +156,14 @@ export default function Wishlist() {
     if (data.success) {
       setSelectedItems([]);
       dispatch(updateUser(data.user));
+      if (actionRef.current.value == "add") {
+        alertContainer.innerHTML = `
+          <div class="alert alert-success alert-dismissible fade show ${alertStyles.alert}">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>Success!</strong> Items added to cart.
+          </div>
+        `;
+      }
     }
   };
 

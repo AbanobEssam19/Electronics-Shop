@@ -53,7 +53,7 @@ export default function Product() {
 
     if (!token) token = sessionStorage.getItem("token");
 
-    const res = await fetch(`/api/cartitem/${product._id}/${amount}`, {
+    const res = await fetch(`/api/cartitem/${product._id}/${amount}/false`, {
       method: "POST",
       headers: {
         token: `${token}`,

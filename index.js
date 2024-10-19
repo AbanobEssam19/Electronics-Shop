@@ -177,12 +177,13 @@ app.prepare().then(() => {
   });
 
   server.post(
-    "/api/cartitem/:id/:quantity",
+    "/api/cartitem/:id/:quantity/:wishlist",
     authenticateToken,
     async (req, res) => {
       const userID = req.user.id;
       const productID = req.params.id;
       const quantity = req.params.quantity;
+      const wishlist = req.params.wishlist;
 
       const product = await products.findById(productID);
 
@@ -218,6 +219,13 @@ app.prepare().then(() => {
           $inc: { popularity: 1 },
         });
       }
+
+      if (wishlist == "true") {
+        await users.findByIdAndUpdate(userID, {
+          $pull: { wishlist: productID },
+        });
+      }
+
       const newUser = await users
         .findById(userID)
         .populate("cart.product")
@@ -383,7 +391,7 @@ app.prepare().then(() => {
       $set: { wishlist: wishlistArr },
     });
 
-    const newUser = await users.findById(userID);
+    const newUser = await users.findById(userID).populate("cart.product").exec();
 
     return res.json({ success: true, user: newUser });
   });
@@ -416,14 +424,29 @@ app.prepare().then(() => {
     const wishlist = user.wishlist;
     let total = user.total;
     const productsToAdd = await products.find({ _id: { $in: wishlist } });
-    for (const product of productsToAdd) total += product.price;
+    let finalProducts = [];
+    for (const product of productsToAdd) {
+      total += product.price;
+      const exist = await users.findOneAndUpdate(
+        {
+          _id: userID,
+          "cart.productID": product._id,
+        },
+        { $inc: { "cart.$.quantity": 1 } });
+      if (!exist) {
+        finalProducts.push(product);
+        await products.findByIdAndUpdate(product._id, {
+          $inc: { popularity: 1 }
+        });
+      }
+    }
     const resSet = await users.findByIdAndUpdate(
       userID,
       {
         $set: { wishlist: [], total: total },
         $addToSet: {
           cart: {
-            $each: productsToAdd.map((p) => ({
+            $each: finalProducts.map((p) => ({
               product: p._id,
               productID: p._id,
               quantity: 1,
@@ -432,7 +455,7 @@ app.prepare().then(() => {
         },
       },
       { new: true }
-    );
+    ).populate("cart.product");
     return res.json({ success: true, user: resSet });
   });
 
@@ -455,14 +478,31 @@ app.prepare().then(() => {
     const newWishlist = user.wishlist.filter((id) => {
       return !productsToAdd.find((product) => product._id == id);
     });
-    for (const product of productsToAdd) total += product.price;
+    let finalProducts = [];
+    for (const product of productsToAdd) {
+      total += product.price;
+      const exist = await users.findOneAndUpdate(
+        {
+          _id: userID,
+          "cart.productID": product._id,
+        },
+        {
+          $inc: { "cart.$.quantity": 1 }
+        });
+      if (!exist) {
+        finalProducts.push(product);
+        await products.findByIdAndUpdate(product._id, {
+          $inc: { popularity: 1 }
+        });
+      }
+    }
     const resSet = await users.findByIdAndUpdate(
       userID,
       {
         $set: { wishlist: newWishlist, total: total },
         $addToSet: {
           cart: {
-            $each: productsToAdd.map((p) => ({
+            $each: finalProducts.map((p) => ({
               product: p._id,
               productID: p._id,
               quantity: 1,
@@ -471,7 +511,7 @@ app.prepare().then(() => {
         },
       },
       { new: true }
-    );
+    ).populate("cart.product");
     return res.json({ success: true, user: resSet });
   });
 
@@ -488,7 +528,7 @@ app.prepare().then(() => {
         $set: { wishlist: newWishlist },
       },
       { new: true }
-    );
+    ).populate("cart.product");
     return res.json({
       success: true,
       user: finalUser,
@@ -523,7 +563,7 @@ app.prepare().then(() => {
       userId,
       { $set: { ...newUser } },
       { new: true }
-    );
+    ).populate("cart.product");
 
     return res.json({ success: true, user: updatedUser });
   });
